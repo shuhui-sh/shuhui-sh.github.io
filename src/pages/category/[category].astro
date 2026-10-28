@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const MAP: Record<string, { label: string; match: (c: string) => boolean }> = {
+  tech: { label: '技术', match: (c) => c !== '生活' },
+  life: { label: '生活', match: (c) => c === '生活' },
+};
+
+export async function getStaticPaths() {
+  return [{ params: { category: 'tech' } }, { params: { category: 'life' } }];
+}
+
+const { category } = Astro.params;
+const conf = MAP[category!];
+const posts = (await getCollection('posts', ({ data }) => !data.draft && conf.match(data.category))).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<BaseLayout title={conf.label}>
+  <section class="intro">
+    <h1>{conf.label}</h1>
+    <p>{posts.length} 篇文章</p>
+  </section>
+
+  <div class="filter">
+    <a href="/">全部</a>
+    <a href="/category/tech/" class={category === 'tech' ? 'active' : ''}>技术</a>
+    <a href="/category/life/" class={category === 'life' ? 'active' : ''}>生活</a>
+  </div>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <div class="post-item-head">
+          <a class="post-title" href={`/posts/${post.id}/`}>{post.data.title}</a>
+          <span class="post-date">{fmt(post.data.date)}</span>
+        </div>
+        {post.data.description && <p class="post-desc">{post.data.description}</p>}
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

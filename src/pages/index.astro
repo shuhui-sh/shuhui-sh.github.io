@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<BaseLayout title="碳基Agent">
+  <section class="intro">
+    <h1>碳基Agent</h1>
+    <p>Android 逆向 · 云游戏 · AI 工程，记录踩过的坑和想明白的事。</p>
+  </section>
+
+  <div class="filter">
+    <a href="/" class="active">全部</a>
+    <a href="/category/tech/">技术</a>
+    <a href="/category/life/">生活</a>
+    <a href="/tags/">标签</a>
+  </div>
+
+  {posts.length === 0 ? (
+    <p class="empty">还没有文章。</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li>
+          <div class="post-item-head">
+            <a class="post-title" href={`/posts/${post.id}/`}>{post.data.title}</a>
+            <span class="post-date">{fmt(post.data.date)}</span>
+          </div>
+          {post.data.description && <p class="post-desc">{post.data.description}</p>}
+          {post.data.tags.length > 0 && (
+            <div class="post-tags">
+              {post.data.tags.slice(0, 5).map((t) => <span>#{t}</span>)}
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

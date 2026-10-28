@@ -1,0 +1,22 @@
+---
+const path = Astro.url.pathname;
+const links = [
+  { href: '/', label: '文章' },
+  { href: '/tags/', label: '标签' },
+  { href: '/about/', label: '关于' },
+];
+---
+
+<header class="site-header">
+  <a class="brand" href="/">碳基Agent</a>
+  <nav>
+    {links.map((l) => (
+      <a
+        href={l.href}
+        aria-current={path === l.href || (l.href !== '/' && path.startsWith(l.href)) ? 'page' : undefined}
+      >
+        {l.label}
+      </a>
+    ))}
+  </nav>
+</header>
