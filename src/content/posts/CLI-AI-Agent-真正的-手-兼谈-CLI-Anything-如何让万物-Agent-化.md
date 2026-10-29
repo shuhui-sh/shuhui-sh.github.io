@@ -1,19 +1,20 @@
 ---
 title: "CLI：AI Agent 真正的'手'——兼谈 CLI-Anything 如何让万物 Agent 化"
-date: 2026-04-08
-description: "上一篇讲完了 MCP 协议——AI Agent 工具调用的标准化层。很多读者留言问：「CLI 直接调用到底算什么，和 MCP 是什么关系？什么时候该用 CLI，什么时候用 MCP？」"
-tags: ['AI', 'Agent']
+date: 2026-04-04
+description: "厘清CLI在Agent工具链的定位，解析CLI-Anything自动化流水线，对比Android的ADB方案体系。"
+tags: []
 category: "技术"
+source: "https://juejin.cn/post/7624447286865362984"
 ---
 ## 前言
 
-上一篇讲完了 MCP 协议——AI Agent 工具调用的标准化层。很多读者留言问：「CLI 直接调用到底算什么，和 MCP 是什么关系？什么时候该用 CLI，什么时候用 MCP？」
+上一篇讲完了 MCP 协议[《AI Agent 的外部连接层：MCP 协议原理、机制设计与实战开发》](https://juejin.cn/post/7616025751747182598 "https://juejin.cn/post/7616025751747182598")——AI Agent 工具调用的标准化层。很多读者留言问：「CLI 直接调用到底算什么，和 MCP 是什么关系？什么时候该用 CLI，什么时候用 MCP？」
 
 这篇来彻底回答这个问题。
 
 本文会厘清 CLI 调用在 Agent 工具链中的本质定位，深度解析最近在 AI 圈爆火的开源项目 **CLI-Anything**——港大数据科学实验室（HKUDS）出品，发布首周即突破万星、截至发稿已超 27K Star，它用一个 7 阶段自动化流水线，把「让任意软件变成 Agent 可调用的 CLI」这件事做成了工业级方案，已覆盖 16+ 个专业软件，通过了 1,800+ 个测试。
 
-**同时**，本文还会专门回答一个 Android 开发者会自然冒出的问题：CLI-Anything 这套方案能用在 Android App 上吗？答案是不能——但 Android 有一套以 ADB 为地基的等价体系，某种程度上比桌面端更成熟，和上一篇文章里「给 AI 换上 root 手机」的实战场景直接衔接。
+**同时**，本文还会专门回答一个 Android 开发者会自然冒出的问题：CLI-Anything 这套方案能用在 Android App 上吗？答案是不能——但 Android 有一套以 ADB 为地基的等价体系，某种程度上比桌面端更成熟，和上一篇文章[《AI 当逆向工程师：Claude Code 自主分析 APK 和 so 文件，解决 Unity 插件化启动崩溃》](https://juejin.cn/post/7622139072376684579 "https://juejin.cn/post/7622139072376684579")里「给 AI 换上 root 手机」的实战场景直接衔接。
 
 ---
 
@@ -61,12 +62,12 @@ MCP 协议          →  工具的标准接口：统一发现和路由
 Stripe、Twilio、各种 SaaS——天生有 REST API。AI Agent 直接 HTTP 调用，零障碍。
 
 **第二个宇宙：GUI 优先的桌面软件**
-GIMP、Blender、LibreOffice、Audacity、OBS Studio——这些是专业工作流真正依赖的工具。它们为人类的眼睛和双手设计：浮动面板、工具栏、拖拽操作、右键菜单。
+GIMP、Blender、LibreOffice、Audacity、OBS Studio、各种开发工具IDE——这些是专业工作流真正依赖的工具。它们为人类的眼睛和双手设计：浮动面板、工具栏、拖拽操作、右键菜单。
 
 当 AI Agent 试图操控第二类软件时，只有三条路：
 
 | 方案 | 做法 | 核心问题 |
-|---|---|---|
+| --- | --- | --- |
 | 手写 Wrapper | 逐个研究软件 API，手动封装 | 耗时数周，软件版本一更新就失效 |
 | RPA 自动化 | 截图 → 视觉模型识别 → 模拟点击 | 窗口布局、主题、分辨率任意变化就崩 |
 | 直接 CLI | 调用软件底层 API，生成结构化命令 | **这才是正确答案** |
@@ -85,7 +86,7 @@ CLI 天然适合 Agent 的工作方式，有四个结构性优势：
 
 命令可以管道链接，一个命令的输出成为下一个命令的输入：
 
-```bash
+```
 # Agent 完成：图片处理 → 压缩 → 上传，三步一气呵成
 cli-anything-gimp image resize --input photo.jpg --width 1920 --output resized.png && \
   cli-anything-gimp export --format webp --quality 80 --input resized.png -o final.webp && \
@@ -104,7 +105,7 @@ cli-anything-gimp image resize --input photo.jpg --width 1920 --output resized.p
 
 每个 CLI 工具都自带 `--help`：
 
-```bash
+```
 $ cli-anything-gimp --help
 Usage: cli-anything-gimp [OPTIONS] COMMAND [ARGS]...
 
@@ -174,7 +175,7 @@ Phase 7: Publish（发布）
 
 整个过程：**一条命令触发，全程自动**。
 
-```bash
+```
 # 以 Claude Code 为例安装插件（也支持 OpenCode、Codex 等平台）
 /plugin marketplace add HKUDS/CLI-Anything
 /plugin install cli-anything
@@ -215,7 +216,7 @@ Phase 7: Publish（发布）
 
 ### 场景 1：Agent 驱动 LibreOffice 批量生成报告
 
-```bash
+```
 # 创建新文档
 cli-anything-libreoffice writer new -o report.json
 
@@ -233,7 +234,7 @@ Agent 不打开任何界面，不"看"屏幕，输出是 LibreOffice 引擎生�
 
 ### 场景 2：Agent 驱动 Blender 创建 3D 场景
 
-```bash
+```
 # 新建项目
 cli-anything-blender project new --width 1920 --height 1080 -o scene.json
 
@@ -249,7 +250,7 @@ cli-anything-blender render --engine cycles --samples 128 -o output.png
 
 ### 场景 3：GIMP 批量图像处理
 
-```bash
+```
 # 批量调整尺寸 + 添加水印（每次调用独立处理一张图，通过 --input/--output 串联步骤）
 for f in *.jpg; do
   cli-anything-gimp image resize --input "$f" --width 1920 --height 1080 --output "resized_$f"
@@ -274,7 +275,7 @@ CLI-Anything 的核心是**扫描桌面软件源码**，从 GUI 事件处理器�
 Android App 有三道根本性的墙：
 
 | 障碍 | 说明 |
-|---|---|
+| --- | --- |
 | **沙箱隔离** | App 运行在手机/模拟器的 ART 沙箱里，不是 PC 的本地进程 |
 | **源码不可扫描** | 大多数 APK 没有可读源码，打包后是编译过的 DEX 字节码（经过混淆/加固后更难分析） |
 | **无本地 CLI 入口** | 没有像 LibreOffice 那样能直接 subprocess 调用的命令行接口 |
@@ -285,7 +286,7 @@ Android App 有三道根本性的墙：
 
 Android 天生有一个对 Agent 极为友好的 CLI——**ADB（Android Debug Bridge）**。作为 Android 开发者，你天天在用它：
 
-```bash
+```
 adb install myapp.apk          # 安装
 adb shell am start -n pkg/.Activity   # 启动 Activity
 adb shell input tap 540 1200   # 点击坐标
@@ -305,7 +306,7 @@ ADB 的地位，等同于 CLI-Anything 为桌面软件生成的那套 CLI——�
 
 > PyPI：`pip install agent-android`（v1.4.0，纯 Python 实现）
 
-```bash
+```
 # 1. 安装（前置条件：ADB 已安装并在 PATH，设备开启 USB 调试）
 pip install agent-android
 adb devices   # 确认设备已连接
@@ -342,10 +343,10 @@ adb devices   # 确认设备已连接
 
 #### 方案二：agent-device（跨平台，iOS / Android / macOS / tvOS / AndroidTV 通用）
 
-> GitHub：[callstackincubator/agent-device](https://github.com/callstackincubator/agent-device)
+> GitHub：[callstackincubator/agent-device](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fcallstackincubator%2Fagent-device "https://github.com/callstackincubator/agent-device")
 > 需要 Node 22+，Callstack 团队出品
 
-```bash
+```
 # 1. 安装
 npm install -g agent-device
 agent-device --version   # 验证
@@ -381,34 +382,13 @@ agent-device close                # 释放 session
 
 ---
 
-#### 方案三（加餐）：android-qa-agent——专为 Claude Code 设计的录制回放工具
-
-> GitHub：[tobrun/android-qa-agent](https://github.com/tobrun/android-qa-agent)
-
-思路和前两个不同——它的定位是**录制 + 回放**：Claude Code 操控 Android 执行测试时，把每一步 ADB 命令录下来，之后可以一键回放，并让 Claude 对截图做 AI 验证。
-
-```bash
-git clone https://github.com/tobrun/android-qa-agent.git
-
-# 在 Claude Code 里描述测试场景，Agent 自动接管并录制：
-# "打开联系人 App，新建联系人 John Doe，电话 +001 1234 5678"
-# → 自动执行 ADB 命令 + 记录每一步到 recordings/
-
-# 回放（带 Claude 截图验证）
-./android-qa-replay recordings/session_001/recording.json
-```
-
-对 Android 开发者最实用的场景：**把 Claude Code 的一次探索性测试固化成可回放的测试用例**，省去手写 Espresso / UI Automator 脚本的时间。
-
----
-
-#### 方案四：Android-Debug-Bridge-MCP（接入 Claude Code 最快路径）
+#### 方案三：Android-Debug-Bridge-MCP（接入 Claude Code 最快路径）
 
 > npm：`npm install -g android-debug-bridge-mcp`
 
 如果你不想折腾 Python 环境或 Node Skill，这是最省事的接入方式——直接把 ADB 能力作为 MCP Server 挂进 Claude Code，一条命令搞定：
 
-```bash
+```
 # 1. 安装
 npm install -g android-debug-bridge-mcp
 
@@ -423,7 +403,7 @@ claude mcp list
 
 **最有价值的特性是 UI Automator 集成**——返回当前界面的完整 XML 结构，让元素定位精准可靠：
 
-```xml
+```
 <!-- Claude Code 调用 UI Automator 后拿到的结构化界面描述 -->
 <hierarchy>
   <node class="android.widget.Button"
@@ -440,16 +420,15 @@ claude mcp list
 
 Agent 拿到 XML 后可以按 `resource-id` 或 `text` 定位元素，再通过 ADB 执行操作——比裸猜坐标稳定，也比 UI Automator 测试脚本轻量。
 
-**四个方案对比**：
+**三个方案对比**：
 
-| | agent-android | agent-device | android-qa-agent | ADB MCP |
-|---|---|---|---|---|
-| **安装** | `pip install` | `npm install -g` | `git clone` | `npm install -g` + MCP 接入 |
-| **接入 Claude Code** | 写 CLAUDE.md | 装 Skill | 原生支持 | MCP 协议，零配置 |
-| **元素定位** | `@ref` | `@ref` | ADB 坐标 | XML selector |
-| **Diff 感知** | ❌ | ✅ | ❌ | ❌ |
-| **录制回放** | ❌ | ❌ | ✅ | ❌ |
-| **最适合场景** | 轻量探索操控 | 深度 Agent 集成 | 测试固化 | 快速接入，无额外依赖 |
+|  | agent-android | agent-device | ADB MCP |
+| --- | --- | --- | --- |
+| **安装** | `pip install` | `npm install -g` | `npm install -g` + MCP 接入 |
+| **接入 Claude Code** | 写 CLAUDE.md | 装 Skill | MCP 协议，零配置 |
+| **元素定位** | `@ref` | `@ref` | XML selector |
+| **Diff 感知** | ❌ | ✅ | ❌ |
+| **最适合场景** | 轻量探索操控 | 深度 Agent 集成 | 快速接入，无额外依赖 |
 
 ### 和上篇「换 root 手机」的衔接
 
@@ -473,7 +452,7 @@ Agent 拿到 XML 后可以按 `resource-id` 或 `text` 定位元素，再通过 
 ### 桌面 vs Android：CLI Agent 体系对比
 
 | 维度 | CLI-Anything（桌面） | ADB Agent CLI（Android） |
-|---|---|---|
+| --- | --- | --- |
 | **信息来源** | 扫描软件源码 | ADB + Accessibility Tree（无障碍树） |
 | **元素定位** | 函数参数（`--input file`） | Ref（`@e1`）或 XML selector |
 | **操控通道** | 本机 subprocess | ADB 桥接（USB / 网络） |
@@ -481,7 +460,7 @@ Agent 拿到 XML 后可以按 `resource-id` 或 `text` 定位元素，再通过 
 | **工具生成** | AI 自动从源码生成 | 现成工具，直接安装 |
 | **适用对象** | 开源桌面软件 | 任意 Android App（无需源码） |
 
-一个有趣的反差：CLI-Anything 需要源码才能工作，而 ADB 方案**不需要 App 源码**——只要能装到设备上，Agent 就能通过 Accessibility Tree 理解和操控它。这意味着 Android 开发者甚至可以让 Agent 去操控竞品 App 做功能对比测试。
+一个有趣的反差：CLI-Anything 需要源码才能工作，而 ADB 方案**不需要 App 源码**——只要能装到设备上，Agent 就能通过 Accessibility Tree 理解和操控它。**这意味着 Android 开发者甚至可以让 Agent 去操控竞品 App 做功能对比测试。**
 
 ---
 
@@ -490,14 +469,24 @@ Agent 拿到 XML 后可以按 `resource-id` 或 `text` 定位元素，再通过 
 两者不是非此即彼，是按场景分工的工具组合。
 
 ```
-有成熟的 CLI 工具？
-    ↓ 是 → 直接用 CLI（零开销、可组合、Agent 熟悉）
-    ↓ 否 →
-        需要复杂状态管理 / OAuth / 流式响应？
-            ↓ 是 → 用 MCP（结构化、可发现、权限管理完善）
-            ↓ 否 → 可以写一个 CLI Wrapper 吗？
-                ↓ 是 → 写 CLI Wrapper（或用 CLI-Anything 生成）
-                ↓ 否 → 用 MCP
+flowchart TD
+    A["需要给 AI Agent 接入一个工具"] --> B{"有成熟的 CLI 工具？"}
+
+    B -->|是| C["✅ 直接用 CLI\n零 schema 开销\n可管道组合\nAgent 训练数据熟悉"]
+
+    B -->|否| D{"需要复杂状态管理\nOAuth / 流式响应？"}
+
+    D -->|是| E["✅ 用 MCP\n结构化可发现\n权限管理完善\n跨平台标准协议"]
+
+    D -->|否| F{"能写一个\nCLI Wrapper 吗？"}
+
+    F -->|是| G["✅ 写 CLI Wrapper\n或用 CLI-Anything\n自动生成"]
+
+    F -->|否| E
+
+    style C fill:#d4edda,stroke:#28a745,color:#155724
+    style E fill:#cce5ff,stroke:#004085,color:#004085
+    style G fill:#d4edda,stroke:#28a745,color:#155724
 ```
 
 实际上，两者经常**同时存在于同一个 Agent 系统**：
@@ -507,6 +496,7 @@ Agent 拿到 XML 后可以按 `resource-id` 或 `text` 定位元素，再通过 
 - 两者背后共用同一套 Skills/CLAUDE.md 来引导 Agent 行为
 
 **一个直观的判断标准**：
+
 - 内层循环（本地、高频、低延迟）→ 优先 CLI
 - 外层循环（外部服务、OAuth、多租户）→ 优先 MCP
 
@@ -546,6 +536,8 @@ CLI-Anything 项目的 slogan 是：
 
 CLI-Anything 发布首周即突破万星，因为**它击中了一个正在形成的时代需求**：不是所有软件都会重写成 API-first 的架构，但通过 CLI-Anything，现有桌面软件可以在几分钟内变成 Agent 可以调用的工具。
 
+国内现在很多IM软件，如钉钉，飞书等，都第一时间推出了CLI版本，目的就是为了适配Agent直接调用。
+
 回到最初的问题——CLI 直接调用在三层工具链中是什么位置？
 
 - **Function Calling**：AI 的语言，表达"我想做什么"
@@ -555,12 +547,3 @@ CLI-Anything 发布首周即突破万星，因为**它击中了一个正在形�
 三者不是替代关系，而是**从意图到执行的完整链路**。CLI 是 Agent 时代的地基——那些无法通过 HTTP API 触达的专业软件、那些深嵌在桌面工作流中的工具，正在以前所未有的速度向 Agent 开放。
 
 **假设你手边有一个没有 API 的内部工具，你会怎么让 Agent 操控它？** 也许 CLI-Anything 的 7 步流水线就是答案——或者至少是一个足够好的起点。
-
----
-
-## 系列文章
-
-本文是「AI Agent 工具调用深度解析系列」的一部分：
-
-- [上篇：MCP 协议深度解析]（链接）— 标准化层的原理与实战
-- **CLI：AI Agent 真正的"手"（本篇）** — CLI 在 Agent 工具链中的本质定位，CLI-Anything 实战

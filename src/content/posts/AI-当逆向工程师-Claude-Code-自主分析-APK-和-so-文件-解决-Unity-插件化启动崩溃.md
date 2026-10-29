@@ -1,9 +1,10 @@
 ---
-title: "让_AI_当逆向工程师_Claude_Code_自主分析_APK_和_so_文件_解决_Unity_插件化启动崩溃"
-date: 2026-04-08
-description: "本文记录了一次与 AI 编程助手（Claude Code）协作排查并优化 Android 插件化云游戏项目的完整过程。"
-tags: ['插件化', 'Android', '逆向', 'AI']
+title: "AI 当逆向工程师：Claude Code 自主分析 APK 和 so 文件，解决 Unity 插件化启动崩溃"
+date: 2026-03-29
+description: "一次真实的 AI 辅助逆向实战：用 Claude Code 排查 Unity 插件化 APK 启动崩溃，AI 自主分析 so 文件、对比目录结构、迭代修复，4 轮迭代删掉 179MB 冗余资源。"
+tags: []
 category: "技术"
+source: "https://juejin.cn/post/7622139072376684579"
 ---
 ## 前言
 
@@ -36,7 +37,7 @@ category: "技术"
 
 用该项目制作的免安装包，游戏原包是 Unity 引擎的。先运行云游戏，下载好游戏原包资源后重启运行 Unity 游戏，启动就出现了 "not enough storage to install required resources" 的错误。
 
-![79f7fed3a1a7abcff84c5f8ff5fb00e552b0524d.jpeg](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/94f84ed5c80a42878acca23fced1da6d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5bel56iL5biITGlmZQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjM2NTgwNDc1NjA3NjU0MSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1775365848&x-orig-sign=ZrJiI3WJU1Po%2FMXWIBaQc1nKASY%3D)
+![79f7fed3a1a7abcff84c5f8ff5fb00e552b0524d.jpeg](/images/AI-当逆向工程师-Claude-Code-自主分析-APK-和-so-文件-解决-Unity-插件化启动崩溃/01.png)
 
 向 Claude Code 描述问题时，想着 AI 能直接从网页搜索可能类似的报错，就直接让它去查：
 
@@ -61,7 +62,7 @@ AI 使用 **WebSearch** 工具搜索：
 
 AI 要求检查设备状态。我在设备上执行命令后提供了结果：
 
-```bash
+```
 $ df -h /data
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/block/...  118G   18G  100G  15% /data
@@ -80,7 +81,7 @@ ls: No such file or directory  # 不存在
 
 AI 使用 **Bash** 工具在 `libunity.so` 中搜索错误字符串（这是它自主地逆向so文件，ai分析so文件就像人类分析普通txt文件一样简单）：
 
-```bash
+```
 $ strings lib/arm64-v8a/libunity.so | grep -B5 -A5 "storage"
 
 输出:
@@ -96,15 +97,15 @@ Not enough storage space to install required resources.
 
 我又提供了构建后的一次包路径：
 
-> **我**："J:\云游戏\一次包\GameProject\cloud_game_0.1.0_103313_... 这个目录是构建好的一次包，你可以再**分析验证下你的猜想**，好像是真的没有 assets/bin/Data/"
+> **我**："J:\云游戏\一次包\GameProject\cloud\_game\_0.1.0\_103313\_... 这个目录是构建好的一次包，你可以再**分析验证下你的猜想**，好像是真的没有 assets/bin/Data/"
 
 Agent自动完成了apk的解压，并对比了两个包的目录结构：
 
-| 位置                       | `assets/bin/Data/` 存在？ |
-| ------------------------ | ---------------------- |
-| 原游戏 APK（game.nosign.apk） | ✅ 存在，~41 MB            |
-| 构建后 base.apk（壳程序）        | ❌ 不存在                  |
-| assets_game.apk（游戏插件）    | ✅ 存在                   |
+| 位置 | `assets/bin/Data/` 存在？ |
+| --- | --- |
+| 原游戏 APK（game.nosign.apk） | ✅ 存在，~41 MB |
+| 构建后 base.apk（壳程序） | ❌ 不存在 |
+| assets\_game.apk（游戏插件） | ✅ 存在 |
 
 **根因确认**：构建工具将 `assets/bin/` 放入了 `assets_game.apk`，但 Unity 从 `ApplicationInfo.sourceDir`（指向 base.apk）读取，找不到资源 → 误报存储不足。
 
@@ -114,11 +115,11 @@ Agent自动完成了apk的解压，并对比了两个包的目录结构：
 
 ### 3.1 AI 提出三个方案
 
-| 方案  | 思路                                 | 优点   | 缺点    |
-| --- | ---------------------------------- | ---- | ----- |
-| A   | 构建时将 `assets/bin/` 复制到 base.apk    | 简单直接 | 增加包体积 |
-| B   | 运行时修改 sourceDir 指向 assets_game.apk | 不增体积 | 反射风险  |
-| C   | 运行时预提取资源到 il2cpp 目录                | 灵活   | 复杂度高  |
+| 方案 | 思路 | 优点 | 缺点 |
+| --- | --- | --- | --- |
+| A | 构建时将 `assets/bin/` 复制到 base.apk | 简单直接 | 增加包体积 |
+| B | 运行时修改 sourceDir 指向 assets\_game.apk | 不增体积 | 反射风险 |
+| C | 运行时预提取资源到 il2cpp 目录 | 灵活 | 复杂度高 |
 
 ### 3.2 选择先验证最快的方案
 
@@ -180,7 +181,7 @@ AI 尝试了两种绕过方案：预填充 patch 目录和 GameData/SyncLoad 目
 
 > **我**："**你应该直接使用搜索技能**，系统内置的网络访问有问题"
 
-这件事进一步验证了，Claude code的一些内置工具的确是会走他们的服务器，而我们的网络的确是会被限制，所以事先就做好工具的平替非常有必要。如何在国内安装 Claude Code、配置好搜索 MCP 等工具，可以参考 [《国内安装 Claude Code 并切换使用国内大模型 API：完整指南》](https://juejin.cn/spost/7611769471619645478)。
+这件事进一步验证了，Claude code的一些内置工具的确是会走他们的服务器，而我们的网络的确是会被限制，所以事先就做好工具的平替非常有必要。如何在国内安装 Claude Code、配置好搜索 MCP 等工具，可以参考 [《国内安装 Claude Code 并切换使用国内大模型 API：完整指南》](https://juejin.cn/spost/7611769471619645478 "https://juejin.cn/spost/7611769471619645478")。
 
 ### 5.3 AI 的技术调研过程
 
@@ -198,7 +199,7 @@ Context.getPackageCodePath()    ← 返回 LoadedApk.mAppDir（不是 sourceDir�
 
 AI 使用 **Bash** 工具搜索 Unity native 层的 API 调用：
 
-```bash
+```
 $ strings lib/arm64-v8a/libunity.so | grep -E "sourceDir|getPackageCodePath|getApplicationInfo"
 ```
 
@@ -236,7 +237,7 @@ AI 增加了 `mAppDir` 和 `mResDir` 的修改。我安装新包后通知：
 
 AI 检查一次包工程的构建代码 `ApkManager.java:1132`：
 
-```java
+```
 // BUG：过滤条件过于宽泛
 if ((entryName.endsWith(".so") && entryName.contains("lib"))) {
     outputPath = gameResDir + File.separator + entryName;  // → 宿主 lib 目录
@@ -276,12 +277,12 @@ AI 删除了 `copyUnityEssentialResources()` 方法和 `assets/bin/` 复制逻�
 
 ## 七、最终优化效果
 
-| 资源                            | 大小          | base.apk 中 | 状态                     |
-| ----------------------------- | ----------- | ---------- | ---------------------- |
-| `assets/bin/Data/`            | ~40 MB      | ❌ 已移除      | ✅ 从 assets_game.apk 加载 |
-| `assets/assets/res/syncload/` | ~133 MB     | ❌ 已移除      | ✅ 从 assets_game.apk 加载 |
-| `assets/assets/res/ui/font/`  | ~6 MB       | ❌ 已移除      | ✅ 从 assets_game.apk 加载 |
-| **合计**                        | **~179 MB** |            | **宿主包体减少 179 MB**      |
+| 资源 | 大小 | base.apk 中 | 状态 |
+| --- | --- | --- | --- |
+| `assets/bin/Data/` | ~40 MB | ❌ 已移除 | ✅ 从 assets\_game.apk 加载 |
+| `assets/assets/res/syncload/` | ~133 MB | ❌ 已移除 | ✅ 从 assets\_game.apk 加载 |
+| `assets/assets/res/ui/font/` | ~6 MB | ❌ 已移除 | ✅ 从 assets\_game.apk 加载 |
+| **合计** | **~179 MB** |  | **宿主包体减少 179 MB** |
 
 ---
 
@@ -356,14 +357,14 @@ AI 在分析问题时，试图通过 adb 查看设备上已安装 APK 的私有�
 
 在整个过程中，我持续在做的一件事是引导 AI 的研究方向，而不是坐等结果：
 
-| 引导输入                        | 目的                    |
-| --------------------------- | --------------------- |
-| "**搜索网络相关资料**"              | 让 AI 先了解 Unity 错误背景   |
+| 引导输入 | 目的 |
+| --- | --- |
+| "**搜索网络相关资料**" | 让 AI 先了解 Unity 错误背景 |
 | "**搜索网络上关于 Unity 的资源加载机制**" | 深入理解 AssetBundle 加载路径 |
-| "你可以**运用逆向的知识**再去分析"        | 激活 AI 的逆向分析能力         |
-| "你可以**搜索定位字符串或验证你的猜想**"     | 引导 AI 用 strings 分析二进制 |
-| "你可以通过**阅读源码，或者网络搜索**来验证"   | 要求实证而非猜测              |
-| "先验证研究，不改代码"                | 控制节奏，避免盲目修改           |
+| "你可以**运用逆向的知识**再去分析" | 激活 AI 的逆向分析能力 |
+| "你可以**搜索定位字符串或验证你的猜想**" | 引导 AI 用 strings 分析二进制 |
+| "你可以通过**阅读源码，或者网络搜索**来验证" | 要求实证而非猜测 |
+| "先验证研究，不改代码" | 控制节奏，避免盲目修改 |
 
 这些引导的根据，一半来自事先对 AI 能力的了解（知道它能搜索、能读源码），一半来自过程中的经验积累（发现它真的能做到，就越来越大胆地提要求）。
 
@@ -386,29 +387,29 @@ AI 自主执行：
 
 这个闭环在四轮迭代中反复运转，每一轮都更流畅：
 
-| 轮次  | 人的输入             | AI 自主完成                       | 结果          |
-| --- | ---------------- | ----------------------------- | ----------- |
-| v1  | "你可以监控测试验证了"     | logcat 分析 → 发现 mAppDir 问题     | ❌ 发现新问题     |
-| v2  | "你可以监控并测试验证了"    | logcat + ZIP 分析 → 发现 .so Bug  | ⚠️ 发现构建 Bug |
-| v3  | "你可以监控验证一下方案的实现" | monkey + logcat + 截图 → 全部通过   | ✅ 完全成功      |
-| v4  | "你可以继续测试验证"      | force-stop + 启动 + logcat → 确认 | ✅ 179MB 优化  |
+| 轮次 | 人的输入 | AI 自主完成 | 结果 |
+| --- | --- | --- | --- |
+| v1 | "你可以监控测试验证了" | logcat 分析 → 发现 mAppDir 问题 | ❌ 发现新问题 |
+| v2 | "你可以监控并测试验证了" | logcat + ZIP 分析 → 发现 .so Bug | ⚠️ 发现构建 Bug |
+| v3 | "你可以监控验证一下方案的实现" | monkey + logcat + 截图 → 全部通过 | ✅ 完全成功 |
+| v4 | "你可以继续测试验证" | force-stop + 启动 + logcat → 确认 | ✅ 179MB 优化 |
 
 这套机制不是事先设计好的，而是在解决问题的过程中自然形成的。但它是可复用的——后来我把它固化成了项目的 `/local-debug` 技能，新的调试任务可以直接走这个闭环。经过这次探索出来的流程总结，当前已经初步可以跑出从用户描述问题开始的：Agent研究——Agent开发——Agent验证——Agent再研究调整——Agent修改开发——Agent再自主验证的循环闭环解法。
 
-![4d74ddb764f3992e941d90850f7e304e.jpg](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f3063dee6d6442b5ac174895ba495296~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg5bel56iL5biITGlmZQ==:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMjM2NTgwNDc1NjA3NjU0MSJ9&rk3s=e9ecf3d6&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1774847791&x-orig-sign=am1aUdX%2Fn%2FPgSJL6xogjaHSVta4%3D)
+![4d74ddb764f3992e941d90850f7e304e.jpg](/images/AI-当逆向工程师-Claude-Code-自主分析-APK-和-so-文件-解决-Unity-插件化启动崩溃/02.png)
 
 ### 9.5 纠正 AI 的错误
 
 AI 不是完美的。整个过程中至少纠正了 6 次错误：
 
-| 纠正输入                         | AI 的错误                       |
-| ---------------------------- | ---------------------------- |
-| "你启动应用的命令不对，应用没有被启动起来"       | 用 `am start` 指定了错误的 Activity |
-| "你检测结果不对，我看到的截图和实际效果是不行的"    | 认为验证通过，实际仍弹错误                |
-| "你看的是一次包中云游戏部分的，你要看的是看游戏的逻辑" | 分析了错误的目标                     |
-| "你应该直接使用搜索技能"                | 用了报错的内置 WebSearch            |
-| "你都没正确触发游戏启动"                | 启动验证流程有误                     |
-| "安装包数据损坏...说明现在的资源方案不对吧"     | 误判方案已生效                      |
+| 纠正输入 | AI 的错误 |
+| --- | --- |
+| "你启动应用的命令不对，应用没有被启动起来" | 用 `am start` 指定了错误的 Activity |
+| "你检测结果不对，我看到的截图和实际效果是不行的" | 认为验证通过，实际仍弹错误 |
+| "你看的是一次包中云游戏部分的，你要看的是看游戏的逻辑" | 分析了错误的目标 |
+| "你应该直接使用搜索技能" | 用了报错的内置 WebSearch |
+| "你都没正确触发游戏启动" | 启动验证流程有误 |
+| "安装包数据损坏...说明现在的资源方案不对吧" | 误判方案已生效 |
 
 这也是为什么叫 L3.5 而不是 L4——AI 能自主做很多事，但仍然需要人在关键节点把关纠偏。
 
@@ -418,12 +419,12 @@ AI 不是完美的。整个过程中至少纠正了 6 次错误：
 
 单个能力的价值有限，但**组合使用**产生了乘数效应：
 
-| 我提供的             | AI 获得的能力              | 在本案例中的作用          |
-| ---------------- | --------------------- | ----------------- |
-| root 设备 + adb 连接 | 设备操作：安装、启动、监控         | 4 轮迭代的自主验证        |
-| Brave Search 技能  | 网络搜索：Unity 机制、AOSP 源码 | sourceDir 方案的技术调研 |
-| 原包/一次包路径         | 文件分析：对比目录、检查 ZIP      | 根因定位 + .so Bug 发现 |
-| "你可以监控验证"        | 自主闭环：logcat + 截图 + 判断 | 每轮迭代的结果验证         |
+| 我提供的 | AI 获得的能力 | 在本案例中的作用 |
+| --- | --- | --- |
+| root 设备 + adb 连接 | 设备操作：安装、启动、监控 | 4 轮迭代的自主验证 |
+| Brave Search 技能 | 网络搜索：Unity 机制、AOSP 源码 | sourceDir 方案的技术调研 |
+| 原包/一次包路径 | 文件分析：对比目录、检查 ZIP | 根因定位 + .so Bug 发现 |
+| "你可以监控验证" | 自主闭环：logcat + 截图 + 判断 | 每轮迭代的结果验证 |
 
 **对比：不了解 AI 能力的协作方式**：
 
@@ -443,7 +444,7 @@ AI 不是完美的。整个过程中至少纠正了 6 次错误：
 
 回顾整个过程，技术方案本身固然重要，但更有价值的是在解决问题过程中对 AI Agent 能力认知的加深，以及摸索出的这套半自动化闭环机制：
 
-**1. 事先了解 Agent 的能力范围** → 知道 AI 具备逆向分析知识、知道它靠 token 预测会产生幻觉，所以一开始就让它搜索验证而非空猜。写在CLAUDE.MD的规则， AI不一定每次都会执行的，所以可增加Hook钩子来提醒它执行。这些都是需要事先了解这些Agent的功能边界。关于 Claude Code 的 MCP、子代理、Hooks、Skills 等核心能力，可以系统了解一下 [《Claude Code 只会问问题？解锁 7 个隐藏能力，效率翻倍》](https://juejin.cn/post/7619245854760009743)，配好这些工具之后，才能跑出本文这样的自动化闭环。
+**1. 事先了解 Agent 的能力范围** → 知道 AI 具备逆向分析知识、知道它靠 token 预测会产生幻觉，所以一开始就让它搜索验证而非空猜。写在CLAUDE.md的规则， AI不一定每次都会执行的，所以可增加Hook钩子来提醒它执行。这些都是需要事先了解这些Agent的功能边界。关于 Claude Code 的 MCP、子代理、Hooks、Skills 等核心能力，可以系统了解一下 [《Claude Code 只会问问题？解锁 7 个隐藏能力，效率翻倍》](https://juejin.cn/post/7619245854760009743 "https://juejin.cn/post/7619245854760009743")，配好这些工具之后，才能跑出本文这样的自动化闭环。
 
 **2. 在过程中发现新的可能性** → 给 AI 换上 root 手机是灵机一动，但效果立竿见影——Agent 的能力边界不只取决于模型，更取决于你给它接上了什么工具。**假设你在同样的环境里面装上frida等逆向工具，它的自动化逆向能力会不会更强？**
 
@@ -456,13 +457,3 @@ AI 不是完美的。整个过程中至少纠正了 6 次错误：
 **6. 保持人在回路** → AI 会犯错（6 次纠正），关键决策不能放手——所以是 L3.5，不是 L4
 
 这次经历的启示：**用好 AI Agent，既需要事先了解它的能力边界，更需要在实践中不断加深理解、给它配工具、指方向、建闭环。** 这不是一次性的认知，而是一个持续进化的过程。
-
----
-
-## 系列文章
-
-本文是「Claude Code 实战系列」的一部分：
-
-- [国内安装 Claude Code 并切换使用国内大模型 API：完整指南](https://juejin.cn/spost/7611769471619645478) — 安装、登录、配置国内模型
-- [Claude Code 只会问问题？解锁 7 个隐藏能力，效率翻倍](https://juejin.cn/post/7619245854760009743) — MCP、子代理、Hooks、Skills 核心配置
-- **让 AI 当逆向工程师（本篇）** — Claude Code 自主分析 APK 和 so 文件的完整实战

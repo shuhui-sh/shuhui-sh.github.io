@@ -1,19 +1,12 @@
 ---
 title: "你在 XML 时代学的渲染优化，进了 Compose 大多不再是重点——Recomposition 才是新的战场"
-date: 2026-10-19
-description: "发布前 TODO： 1. ✅ Layout Inspector 真实截图已补：images/layoutinspectorstep0.png（小米 13 Pro / API 36）"
-tags: ['性能优化', 'Android', 'Compose']
+date: 2026-10-22
+description: "XML 时代的过度绘制、层级压平，到了 Compose 大多不再是重点——新战场是重组。本文用 Layout Inspector 定位问题，讲清触发与稳定性规则，四步修复搜索列表页，真机数据验证。"
+tags: []
 category: "技术"
+source: "https://juejin.cn/post/7699368463357755443"
 ---
-<!--
-发布前 TODO：
-1. ✅ Layout Inspector 真实截图已补：images/layout_inspector_step0.png（小米 13 Pro / API 36）
-   · 米6 是 API 28，开不了重组计数，所以截图设备与性能数据设备不同，正文已加注
-2. images/ 目录随文章一起上传，确认图床路径
-3. 发布前清理未引用的过程图：befor_p.png / after_p.jpg / after2.jpg / after3.jpg / skipped.jpg / 7D679692-*.jpg / 02_~08_ 前缀拼图原料
--->
-
-# 你在 XML 时代学的渲染优化，进了 Compose 大多不再是重点——Recomposition 才是新的战场
+## 你在 XML 时代学的渲染优化，进了 Compose 大多不再是重点——Recomposition 才是新的战场
 
 > 本文是「Android 应用性能优化」系列第二篇。上一篇我们靠消灭 Overdraw、用 ConstraintLayout 压平层级，治好了商品列表的卡顿。这一篇迁移到 Jetpack Compose，你会发现：那套打法大多不再是重点，新的战场叫 **Recomposition（重组）**。
 >
@@ -23,7 +16,7 @@ category: "技术"
 
 ---
 
-## 一、问题提出：Compose 写的列表，为什么还是卡？
+### 一、问题提出：Compose 写的列表，为什么还是卡？
 
 产品又找过来了。
 
@@ -33,11 +26,11 @@ category: "技术"
 
 **先排除 Overdraw。** 打开 Debug GPU Overdraw（设置 → 开发者选项 → 调试 GPU 过度绘制 → 显示过度绘制区域），看一眼色阶。
 
-![Debug GPU Overdraw 下的搜索页（小米 6）](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/01_overdraw_step0.png)
+![Debug GPU Overdraw 下的搜索页（小米 6）](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/01.png)
 
 页面背景是蓝色（1 层，来自 Window 背景上再铺一层 `Surface`），文字和标签底色是绿色（2 层），只有标签上的文字是粉色（3 层），没有任何红色（4 层以上）区域。Overdraw 在 Compose 里依然存在（叠多层 `background`、`Surface` 照样会产生），但这里显然不是主因。
 
-**再排除层级深度。** 官方文档的原话是："Compose handles nested layouts efficiently, making them a great way to design a complicated UI. This is an improvement from Android Views, where you need to avoid nested layouts for performance reasons."（[Compose 布局基础](https://developer.android.com/develop/ui/compose/layouts/basics)）。Compose 的布局系统不允许对子节点进行二次测量，层级再深，测量开销也是线性增长，不会像 RelativeLayout 嵌套那样成倍放大。
+**再排除层级深度。** 官方文档的原话是："Compose handles nested layouts efficiently, making them a great way to design a complicated UI. This is an improvement from Android Views, where you need to avoid nested layouts for performance reasons."（[Compose 布局基础](https://link.juejin.cn?target=https%3A%2F%2Fdeveloper.android.com%2Fdevelop%2Fui%2Fcompose%2Flayouts%2Fbasics "https://developer.android.com/develop/ui/compose/layouts/basics")）。Compose 的布局系统不允许对子节点进行二次测量，层级再深，测量开销也是线性增长，不会像 RelativeLayout 嵌套那样成倍放大。
 
 > 上一篇学的那一套（去背景、拍平层级），在这里基本帮不上忙。问题出在另一个地方。
 
@@ -45,7 +38,7 @@ category: "技术"
 
 ---
 
-### 打开 Layout Inspector，让问题现形
+#### 打开 Layout Inspector，让问题现形
 
 Android Studio 菜单栏：
 
@@ -78,7 +71,7 @@ SearchScreen              Recompositions 1   Skipped 0
        ... （屏幕上可见的 6 个 Item，全部：Recompositions 1 / Skipped 0）
 ```
 
-![Step 0 输入一个字符后的 Layout Inspector](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/layout_inspector_step0.png)
+![Step 0 输入一个字符后的 Layout Inspector](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/02.png)
 
 > 上图是真实的 Layout Inspector 输出：`LazyColumn` 下面的 `ProductItem` 逐行都有重组计数，`Skipped Recompositions` 列为空（即 0）——可见的 Item 一个都没被跳过。这就是 Step 0 的病根。
 >
@@ -86,13 +79,13 @@ SearchScreen              Recompositions 1   Skipped 0
 
 Layout Inspector 只能在 Debug 包上用，也不方便自动化。所以配套 Demo 在每个被测 Composable 开头加了一行计数：
 
-```kotlin
+```
 SideEffect { RecompositionCounter.inc("ProductItem") }
 ```
 
 `SideEffect` 本身不可跳过：函数体执行了它就一定执行，函数被跳过它就不执行，所以它统计的正是该函数的执行次数。下图是 Release 包里，在 "ph" 后面再输入一个 "o" 时的计数面板（左下角）：
 
-![输入 "o" 时 Step 0 / 1 / 2 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/cmp_key_o_step0_1_2.png)
+![输入 "o" 时 Step 0 / 1 / 2 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/03.png)
 
 先只看最左边的 Step 0（问题版本），两个信号同时出现：
 
@@ -105,9 +98,9 @@ SideEffect { RecompositionCounter.inc("ProductItem") }
 
 ---
 
-## 二、相关知识点讲解
+### 二、相关知识点讲解
 
-### 2.1 Compose 渲染三阶段：和 XML 的关键区别
+#### 2.1 Compose 渲染三阶段：和 XML 的关键区别
 
 Compose 渲染一帧同样经过三个阶段：
 
@@ -119,8 +112,8 @@ Compose 渲染一帧同样经过三个阶段：
 
 和 XML 对比：
 
-| | XML 时代 | Compose |
-|--|---------|---------|
+|  | XML 时代 | Compose |
+| --- | --- | --- |
 | 测量次数 | RelativeLayout 双重测量；LinearLayout 设置 weight 时二次测量 | 每个子节点只允许测量一次（intrinsic 是测量前的尺寸查询，不算二次测量） |
 | 层级影响 | 越深越慢，需要拍平 | 深层级不再是主要问题 |
 | 优化主战场 | 减少 Measure/Draw 的无效工作 | **减少 Composition 阶段的无效执行** |
@@ -129,7 +122,7 @@ Compose 渲染一帧同样经过三个阶段：
 
 ---
 
-### 2.2 谁触发了重组：状态读取的位置决定重组范围
+#### 2.2 谁触发了重组：状态读取的位置决定重组范围
 
 Compose 用快照系统（Snapshot System）追踪状态的读写。每个 `@Composable` 函数执行时，系统会记录它读取了哪些状态。状态一旦变化：
 
@@ -149,11 +142,11 @@ Compose 用快照系统（Snapshot System）追踪状态的读写。每个 `@Com
 
 ---
 
-### 2.3 稳定性：子 Composable 能不能被跳过
+#### 2.3 稳定性：子 Composable 能不能被跳过
 
 父级重组时，Compose 会逐个检查子 Composable 的参数：**参数没变，就跳过**。判断"变没变"的方式，取决于参数类型是稳定的（Stable）还是不稳定的（Unstable）：
 
-```kotlin
+```
 // ✅ 稳定：基础类型、String、函数类型、枚举，
 //    以及所有属性都是 val 且类型稳定的类（不限于 data class）
 data class A(val id: Int, val name: String)
@@ -167,8 +160,8 @@ data class C(val id: Int, val tags: List<String>)
 
 比较规则（**Kotlin 2.0.20+ 默认开启 Strong Skipping**）：
 
-| | 稳定类型 | 不稳定类型 |
-|--|---------|-----------|
+|  | 稳定类型 | 不稳定类型 |
+| --- | --- | --- |
 | 比较方式 | `equals()` 内容相等 | `===` 实例相等 |
 | Strong Skipping 之前 | 参数没变就跳过 | **只要有一个参数不稳定，整个函数都不可跳过** |
 | Strong Skipping 之后 | 参数没变就跳过 | **实例没变才跳过，实例一变就跳不过** |
@@ -184,7 +177,7 @@ data class C(val id: Int, val tags: List<String>)
 
 Compose 编译器可以把稳定性推断结果输出成报告。在模块的 `build.gradle.kts` 里（注意：`composeCompiler` 块在文件顶层，不在 `android {}` 里面；需要先应用 Compose 编译器插件）：
 
-```kotlin
+```
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -208,7 +201,7 @@ composeCompiler {
 
 先看 `module.json`，确认 Strong Skipping 确实开着（Demo 实际输出）：
 
-```json
+```
 "featureFlags": {
     "StrongSkipping": true,
     "IntrinsicRemember": true,
@@ -239,11 +232,11 @@ unstable class ProductUi {
 
 ---
 
-### 2.4 两个关键工具：remember 与 derivedStateOf
+#### 2.4 两个关键工具：remember 与 derivedStateOf
 
 **`remember`：跨重组缓存计算结果**
 
-```kotlin
+```
 // ❌ 每次重组都重新排序
 val sorted = contacts.sortedWith(comparator)
 
@@ -253,7 +246,7 @@ val sorted = remember(contacts, comparator) { contacts.sortedWith(comparator) }
 
 **`derivedStateOf`：状态降频**
 
-```kotlin
+```
 val listState = rememberLazyListState()
 
 // ❌ firstVisibleItemIndex 每滚过一个 Item 就变一次，
@@ -271,15 +264,15 @@ val showFab by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 }
 
 ---
 
-## 三、具体实例应用展示
+### 三、具体实例应用展示
 
 **案例：商品搜索列表页**——顶部搜索框（实时过滤）+ LazyColumn 商品列表（500 个商品）+ 右下角随滚动偏移的 FAB。
 
-### Step 0：诊断现场，先看工具，再动代码
+#### Step 0：诊断现场，先看工具，再动代码
 
 先把案例的完整基础代码列出来（后面每一步只展示改动的部分）。依赖：Compose Material3、`material-icons-core`、`lifecycle-runtime-compose`、Coil（`coil-compose`）。
 
-```kotlin
+```
 // ===== 数据层 =====
 data class Product(
     val id: Int,
@@ -316,7 +309,7 @@ class SearchViewModel(repository: ProductRepository) : ViewModel() {
 }
 ```
 
-```kotlin
+```
 // ===== 页面（问题版本）=====
 @Composable
 fun SearchScreen(viewModel: SearchViewModel) {
@@ -419,13 +412,13 @@ fun ScrollFab(listState: LazyListState, modifier: Modifier = Modifier) {
 
 ---
 
-### Step 1：缩小重组范围，把 query 状态下沉
+#### Step 1：缩小重组范围，把 query 状态下沉
 
 **根因**：`query` 在 `SearchScreen` 顶层读取，整个页面函数是震源。
 
 **修复**：把 `query` 和列表放进一个独立的 Composable（注意是独立函数，见 2.2 节），`SearchScreen` 不再读取 `query`。
 
-```kotlin
+```
 @Composable
 fun SearchScreen(viewModel: SearchViewModel) {
     val products by viewModel.products.collectAsStateWithLifecycle()
@@ -462,7 +455,7 @@ private fun SearchContent(products: List<Product>, listState: LazyListState) {
 
 **意外收获（滚动）**：这一步在滚动场景下的收益，比在输入场景下大得多。下图是两个版本各上滑 10 次后的计数：
 
-![滚动 10 次后 Step 0 与 Step 1 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/cmp_scroll_step0_1.png)
+![滚动 10 次后 Step 0 与 Step 1 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/04.png)
 
 Step 0 里，`SearchScreen` 每滚过一个 Item 就重组一次（问题 ③），每次重组都重新 `map` 出一批新的 `ProductUi`，于是可见的 Item 全部跟着重组：`ProductItem` 执行了 431 次。Step 1 里，`SearchScreen` 照样重组，但 `filter + map` 已经搬进了 `SearchContent`，而 `SearchContent` 的两个参数（`products` 和 `listState`）都没变，整个函数被跳过。`ProductItem` 只剩新滑入屏幕时的 54 次。
 
@@ -470,7 +463,7 @@ Step 0 里，`SearchScreen` 每滚过一个 Item 就重组一次（问题 ③）
 
 ---
 
-### Step 2：修复实例抖动，让 ProductItem 真正被跳过
+#### Step 2：修复实例抖动，让 ProductItem 真正被跳过
 
 **根因**：`ProductUi` 不稳定，而每次重组都 `map` 出全新实例。两者叠加，`===` 永远不相等。
 
@@ -478,7 +471,7 @@ Step 0 里，`SearchScreen` 每滚过一个 Item 就重组一次（问题 ③）
 
 **路线 A：让实例不抖。** `map` 不该放在 Composition 里，数据变了才映射一次，放进 ViewModel：
 
-```kotlin
+```
 class SearchViewModel(repository: ProductRepository) : ViewModel() {
     // ✅ 数据源变化时才映射一次，之后实例保持不变
     val products: StateFlow<List<ProductUi>> = repository.productsFlow()
@@ -500,12 +493,12 @@ private fun SearchContent(products: List<ProductUi>, listState: LazyListState) {
 
 **路线 B：让类型稳定。** 把 `List` 换成 kotlinx 的不可变集合，这样比较方式从 `===` 变成 `equals()`，即使实例变了、内容相等也能跳过。比如数据源刷新、重新 `map` 出一批内容相同的新实例时，路线 A 拦不住，路线 B 能拦住，等于给路线 A 加了一道保险：
 
-```kotlin
+```
 // build.gradle.kts（Demo 使用 0.3.8，请以 Maven Central 上的最新版为准）
 implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
 ```
 
-```kotlin
+```
 data class ProductUi(
     val id: Int,
     val name: String,
@@ -527,7 +520,7 @@ fun Product.toUi() = ProductUi(
 - **自己的类**：可以加 `@Immutable` 或 `@Stable` 注解，向编译器"担保"它不会变。
 - **第三方类型**（改不了源码，自然也加不了注解），或者想让整个项目把 `List` 都当成稳定类型：用**稳定性配置文件**。
 
-```kotlin
+```
 composeCompiler {
     // Kotlin 2.0.x 的写法；更新的版本改为复数形式 stabilityConfigurationFiles.add(...)
     stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
@@ -570,11 +563,11 @@ stable class ProductUi {
 
 ---
 
-### Step 3：LazyColumn 加 key，让 Item 按身份而非位置匹配
+#### Step 3：LazyColumn 加 key，让 Item 按身份而非位置匹配
 
 **根因**：LazyColumn 默认用位置（index）作为 Item 的标识。过滤或重排之后，原来在第 3 位的商品移动到了第 2 位，Compose 看到的是"第 2 位的参数变了"，只能重组。
 
-```kotlin
+```
 LazyColumn(state = listState) {
     items(
         items = uiItems,
@@ -587,19 +580,19 @@ LazyColumn(state = listState) {
 
 **验证**：从 "p" 输入到 "ph"，结果集会变（Laptop、Speaker 被过滤掉）：
 
-![从 "p" 输入到 "ph"：无 key 与有 key 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/cmp_key_h_step2_3.png)
+![从 "p" 输入到 "ph"：无 key 与有 key 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/05.png)
 
 逐个位置推演一下就能对上实测数字：
 
 | 位置 | "p" 时 | "ph" 时 | 无 key（按位置比） | 有 key（按 id 比） |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | Phone X1 | Phone X1 | 相同，跳过 | 已在屏幕上，跳过 |
 | 2 | Laptop X1 | Headphone X1 | **不同，重组** | 已在屏幕上，跳过 |
 | 3 | Headphone X1 | Phone X2 | **不同，重组** | 已在屏幕上，跳过 |
 | 4 | Speaker X1 | Headphone X2 | **不同，重组** | **新进入，组合** |
 | 5 | Phone X2 | Phone X3 | **不同，重组** | **新进入，组合** |
 | 6 | Laptop X2 | Headphone X3 | **不同，重组** | **新进入，组合** |
-| 合计 | | | **5 次** | **3 次** |
+| 合计 |  |  | **5 次** | **3 次** |
 
 **踩坑记录**：
 
@@ -608,13 +601,13 @@ LazyColumn(state = listState) {
 
 ---
 
-### Step 4：延迟状态读取，让滚动不再触发 Composition
+#### Step 4：延迟状态读取，让滚动不再触发 Composition
 
 前三步解决的是"输入时"的重组。还剩下"滚动时"的两个问题：问题 ③（`showFab` 让 `SearchScreen` 随 Item 切换而重组）和问题 ⑤（`ScrollFab` 每帧都在重组）。
 
 **4.1 用 `derivedStateOf` 给显隐降频**（问题 ③）：
 
-```kotlin
+```
 @Composable
 fun SearchScreen(viewModel: SearchViewModel) {
     val products by viewModel.products.collectAsStateWithLifecycle()
@@ -637,7 +630,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
 
 **4.2 把偏移量的读取推迟到 Layout 阶段**（问题 ⑤）：
 
-```kotlin
+```
 // ✅ 接收 () -> Int，而不是 Int
 @Composable
 fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
@@ -656,7 +649,7 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
 
 **验证**：两个版本各上滑 10 次后的计数：
 
-![滚动 10 次后 Step 3 与 Step 4 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/cmp_scroll_step3_4.png)
+![滚动 10 次后 Step 3 与 Step 4 的执行次数对比](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/06.png)
 
 `SearchScreen` 从 53 次降到 1 次（FAB 出现那一次），`ScrollFab` 从 510 次降到 1 次（首次组合那一次）。滚动掉帧率从 17.9% 降到 **11.1%**。
 
@@ -664,14 +657,14 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
 
 ---
 
-### 量化对比：真机实测
+#### 量化对比：真机实测
 
 **测量方法**：小米 6（Android 9，60Hz，帧预算 16.7ms），Release 包（R8 开启），测量前用 `adb shell cmd package compile -m speed -f` 全量 AOT 编译，排除 JIT 预热的干扰。帧数据来自 `adb shell dumpsys gfxinfo`，每个 Step 先跑 1 轮预热（丢弃），再取 5 轮平均。按键和滑动都由 adb 注入，脚本和原始数据都在 `compose-recomposition-demo/` 目录里，可以完整复现。
 
 **重组次数**
 
 | 场景 | 指标 | Step 0 | Step 1 | Step 2 | Step 3 | Step 4 |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 单次按键 | SearchScreen | 1 | **0** | 0 | 0 | 0 |
 | 按键且结果集不变（"ph"→"pho"） | ProductItem | 6 | 6 | **0** | 0 | 0 |
 | 按键且结果集变化（""→"p"） | ProductItem | 6 | 6 | 3 | **2** | 2 |
@@ -685,7 +678,7 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
 **帧数据**
 
 | 场景 | 指标 | Step 0 | Step 1 | Step 2 | Step 3 | Step 4 |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 滚动 | 掉帧率 | 34.1% | 20.4% | 20.0% | 17.9% | **11.1%** |
 | 滚动 | P90 帧耗时 | 40.4ms | 19.4ms | 18.6ms | 18.2ms | **16.6ms** |
 | 滚动 | P99 帧耗时 | 61.0ms | 24.8ms | 25.6ms | 24.4ms | **23.0ms** |
@@ -694,11 +687,11 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
 | 输入 | P90 帧耗时 | 57.0ms | 56.0ms | 43.6ms | 41.2ms | **40.0ms** |
 | 输入 | P99 帧耗时 | 77.0ms | 79.4ms | 52.8ms | 53.6ms | 54.4ms |
 
-![滚动场景掉帧率](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/chart_scroll_jank.png)
+![滚动场景掉帧率](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/07.png)
 
-![滚动场景 P90 帧耗时](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/chart_scroll_p90.png)
+![滚动场景 P90 帧耗时](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/08.png)
 
-![输入场景 P90 帧耗时](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/chart_typing_p90.png)
+![输入场景 P90 帧耗时](/images/你在-XML-时代学的渲染优化-进了-Compose-大多不再是重点-Recomposition-才是新的战场/09.png)
 
 从数据里能读出三件事：
 
@@ -708,12 +701,12 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
 
 ---
 
-## 四、总结
+### 四、总结
 
-### XML 时代 vs Compose 时代：优化手段全对照
+#### XML 时代 vs Compose 时代：优化手段全对照
 
 | 对比维度 | XML 时代（第一篇） | Compose 时代（本篇） |
-|---------|----------------|-----------------|
+| --- | --- | --- |
 | 性能敌人 | Overdraw + 层级过深 | 不必要的 Recomposition |
 | 诊断工具 | Debug GPU Overdraw（色阶图） | Layout Inspector 重组/跳过计数 |
 | 静态分析 | Layout Inspector 层级树 | Compose Compiler Report |
@@ -722,7 +715,7 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
 | 核心手段 | ConstraintLayout | 状态下沉 / 稳定类型 / `derivedStateOf` / 延迟读取 |
 | 效果验证 | Profile GPU Rendering | `dumpsys gfxinfo` / Macrobenchmark（Release 包） |
 
-### 速查表：5 条 Compose 渲染优化原则
+#### 速查表：5 条 Compose 渲染优化原则
 
 ```
 ✅ 1. 在哪里读状态，哪里就是重组震源
@@ -747,7 +740,7 @@ fun ScrollFab(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
       → 状态变化只触发布局或绘制，不触发重组
 ```
 
-### 方法论升华
+#### 方法论升华
 
 XML 时代优化的是"画布"：让 GPU 少画几层不该画的像素。Compose 时代优化的是"决策"：让运行时少执行几个不该执行的函数。
 
@@ -755,7 +748,7 @@ XML 时代优化的是"画布"：让 GPU 少画几层不该画的像素。Compos
 
 最后，用帧数据收尾，而不是用重组计数收尾。本文的输入场景就是一个反例：重组次数降了 80%，掉帧率却纹丝不动。计数告诉你"有没有做无用功"，帧数据才告诉你"用户能不能感觉到"。
 
-### 下篇预告
+#### 下篇预告
 
 渲染优化解决的是内容出现之后的流畅度。但在内容出现之前，用户还要经历一段等待——**冷启动**。
 
@@ -763,12 +756,12 @@ XML 时代优化的是"画布"：让 GPU 少画几层不该画的像素。Compos
 
 ---
 
-## 附录：验证工程
+### 附录：验证工程
 
-配套工程位于 `compose-recomposition-demo/`，`step0` ~ `step4` 五个包分别对应正文的五个版本。和正文代码相比，只有两处差别：每个被测 Composable 开头多了一行 `SideEffect` 计数；`ProductItem` 的布局抽成了公共函数 `ProductRow`，方便五个版本复用。
+配套工程已开源：[compose-recomposition-demo](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fshuhui-sh%2Fcompose-recomposition-demo "https://github.com/shuhui-sh/compose-recomposition-demo")，`step0` ~ `step4` 五个包分别对应正文的五个版本。和正文代码相比，只有两处差别：每个被测 Composable 开头多了一行 `SideEffect` 计数；`ProductItem` 的布局抽成了公共函数 `ProductRow`，方便五个版本复用。
 
 | 文件 | 作用 |
-|---|---|
+| --- | --- |
 | `RecompositionCounter.kt` | 执行次数计数器，可以通过广播 `com.demo.RESET` / `com.demo.DUMP` 清零或输出到 logcat |
 | `measure_typing.sh` | 逐键计数（"p" → "h" → "o"） |
 | `measure_frames.sh` | 滚动 / 输入场景的计数和 `gfxinfo` 帧统计（含 AOT 编译和预热轮） |
