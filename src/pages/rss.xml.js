@@ -1,20 +1,18 @@
-import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import rss from "@astrojs/rss";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../config";
+import { getCollection } from "astro:content";
 
 export async function GET(context) {
-  const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-  );
-
+  const blog = await getCollection("blog");
   return rss({
-    title: '碳基Agent',
-    description: 'Android 逆向、云游戏、AI 工程实践笔记',
-    site: context.site,
-    items: posts.map((post) => ({
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    site: import.meta.env.SITE,
+    items: blog.map((post) => ({
       title: post.data.title,
-      pubDate: post.data.date,
+      pubDate: post.data.pubDate,
       description: post.data.description,
-      link: `/posts/${post.id}/`,
+      link: `/blog/${post.slug}/`,
     })),
   });
 }

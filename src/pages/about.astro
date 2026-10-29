@@ -1,22 +1,30 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="关于" description="关于这个博客和作者">
-  <section class="intro">
-    <h1>关于</h1>
-  </section>
+<BaseLayout title="关于" sideBarActiveItemID="about">
+  <div class="mt-4 max-w-2xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-6">关于</h1>
 
-  <div class="article-body">
-    <p>
-      这里是我的个人技术博客，主要记录 Android 逆向、云游戏、插件化与 AI 工程方面的实践。
-      文章优先发布在掘金，这里是完整存档——不受平台规则变化影响。
-    </p>
-    <p>联系方式：</p>
-    <ul>
-      <li>掘金：碳基Agent</li>
-      <li>GitHub：<a href="https://github.com/" target="_blank" rel="noopener">待补充</a></li>
-    </ul>
-    <p>本站使用 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> 构建，托管在 GitHub Pages。</p>
+    <div class="prose prose-lg max-w-none">
+      <p>
+        这里是我的个人技术博客，主要记录 Android 逆向、云游戏、插件化与 AI 工程方面的实践。
+      </p>
+      <p>
+        文章优先发布在掘金，这里是完整存档——不受平台规则变化影响，图片也全部本地化。
+      </p>
+
+      <h2>找到我</h2>
+      <ul>
+        <li>掘金：碳基Agent</li>
+        <li>GitHub：<a href="https://github.com/shuhui-sh" target="_blank" rel="noopener">shuhui-sh</a></li>
+        <li>RSS：<a href="/rss.xml">/rss.xml</a></li>
+      </ul>
+
+      <h2>关于本站</h2>
+      <p>
+        使用 Astro + TailwindCSS 构建，托管在 GitHub Pages。Mermaid 图表在浏览器端渲染。
+      </p>
+    </div>
   </div>
 </BaseLayout>

@@ -1,101 +1,41 @@
 ---
-import Header from '../components/Header.astro';
-import '../styles/global.css';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SideBar from "../components/SideBar.astro";
+import { ViewTransitions } from "astro:transitions";
 
-interface Props {
-  title: string;
-  description?: string;
-}
+import { SITE_TITLE, SITE_DESCRIPTION, TRANSITION_API } from "../config";
 
-const { title, description = 'Android 逆向、云游戏、AI 工程实践笔记' } = Astro.props;
-const siteName = '碳基Agent';
-const fullTitle = title === siteName ? title : `${title} · ${siteName}`;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://shuhui-sh.github.io');
+const {
+  image,
+  title = SITE_TITLE,
+  description = SITE_DESCRIPTION,
+  includeSidebar = true,
+  sideBarActiveItemID,
+  ogType,
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="lofi">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{fullTitle}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><text y='.9em' x='50%' text-anchor='middle' font-size='62' fill='white' font-family='monospace'>C</text></svg>" />
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="article" />
-    <meta name="generator" content={Astro.generator} />
+    <BaseHead title={title} description={description} image={image} , ogType={ogType} />
+    {TRANSITION_API && <ViewTransitions />}
   </head>
   <body>
-    <div class="page">
-      <Header />
-      <main>
-        <slot />
-      </main>
-      <footer class="site-footer">
-        <span>© {new Date().getFullYear()} 碳基Agent</span>
-        <span class="footer-links">
-          <a href="/rss.xml">RSS</a>
-          <a href="https://github.com/shuhui-sh" target="_blank" rel="noopener">GitHub</a>
-        </span>
-      </footer>
+    <div class="bg-base-100 drawer lg:drawer-open">
+      <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content bg-base-100">
+        <Header title={SITE_TITLE} />
+        <div class="md:flex md:justify-center">
+          <main class="p-6 pt-10 lg:max-w-[900px] max-w-[100vw]">
+            <slot />
+          </main>
+        </div>
+        <Footer />
+      </div>
+      {includeSidebar && <SideBar sideBarActiveItemID={sideBarActiveItemID} />}
     </div>
-
-    <script>
-      // Mermaid：Shiki 会把 ```mermaid 当 plaintext，这里按语法特征识别后交给 mermaid 渲染
-      const MERMAID_RE =
-        /^\s*(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|gantt|pie|journey|mindmap|timeline|quadrantChart|gitGraph|block-beta|packet-beta|architecture-beta|sankey-beta|xychart-beta)\b/;
-
-      const nodes: HTMLElement[] = [];
-      document.querySelectorAll('.article-body pre').forEach((pre) => {
-        const code = pre.querySelector('code')?.innerText ?? pre.textContent ?? '';
-        if (MERMAID_RE.test(code)) {
-          const div = document.createElement('div');
-          div.className = 'mermaid';
-          div.textContent = code;
-          pre.replaceWith(div);
-          nodes.push(div);
-        }
-      });
-
-      if (nodes.length) {
-        import('mermaid').then(async ({ default: mermaid }) => {
-          const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: dark ? 'dark' : 'neutral',
-            fontFamily: 'inherit',
-            securityLevel: 'loose',
-            flowchart: { htmlLabels: true, curve: 'basis' },
-          });
-          try {
-            await mermaid.run({ nodes });
-          } catch (e) {
-            console.warn('mermaid render failed', e);
-          }
-        });
-      }
-
-      // 代码块复制按钮
-      document.querySelectorAll('.article-body pre').forEach((pre) => {
-        const btn = document.createElement('button');
-        btn.className = 'copy-btn';
-        btn.type = 'button';
-        btn.textContent = '复制';
-        btn.addEventListener('click', async () => {
-          const code = pre.querySelector('code')?.innerText ?? pre.innerText;
-          try {
-            await navigator.clipboard.writeText(code);
-            btn.textContent = '已复制';
-          } catch {
-            btn.textContent = '失败';
-          }
-          setTimeout(() => (btn.textContent = '复制'), 1600);
-        });
-        pre.appendChild(btn);
-      });
-    </script>
   </body>
 </html>
