@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// TODO: 用你的真实经历替换
+const experience = [
+  {
+    period: "20XX.XX — 至今",
+    role: "职位名称",
+    company: "公司名称",
+    desc: "负责什么、做出了什么结果。建议用「动作 + 结果」描述，比如「主导 X 系统重构，崩溃率下降 40%」。",
+  },
+  {
+    period: "20XX.XX — 20XX.XX",
+    role: "职位名称",
+    company: "公司名称",
+    desc: "负责什么、做出了什么结果。",
+  },
+];
+
+const skills = [
+  { group: "语言", items: ["Kotlin", "Java", "Python", "TypeScript"] },
+  { group: "方向", items: ["Android 逆向", "插件化", "性能优化", "AI Agent"] },
+  { group: "工具", items: ["Frida", "JADX", "Ghidra", "Claude Code"] },
+];
+---
+
+<BaseLayout title="简历" sideBarActiveItemID="cv">
+  <div class="mt-2 mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold mb-2">简历</h1>
+    <p class="opacity-60 text-sm">目前是占位结构，等你的资料替换。</p>
+  </div>
+
+  <section class="mb-10">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <span class="w-1.5 h-5 bg-primary rounded-full inline-block"></span>工作经历
+    </h2>
+    <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
+      {experience.map((e, i) => (
+        <li>
+          {i > 0 && <hr />}
+          <div class="timeline-middle">
+            <div class="w-3 h-3 rounded-full bg-primary"></div>
+          </div>
+          <div class="timeline-end mb-6 ml-4">
+            <time class="text-xs opacity-50">{e.period}</time>
+            <div class="font-semibold mt-0.5">{e.role} · {e.company}</div>
+            <p class="text-sm opacity-75 mt-1 leading-relaxed">{e.desc}</p>
+          </div>
+          {i < experience.length - 1 && <hr />}
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <span class="w-1.5 h-5 bg-primary rounded-full inline-block"></span>技能
+    </h2>
+    <div class="space-y-3">
+      {skills.map((s) => (
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm opacity-60 w-14 shrink-0">{s.group}</span>
+          {s.items.map((it) => <span class="badge badge-outline">{it}</span>)}
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

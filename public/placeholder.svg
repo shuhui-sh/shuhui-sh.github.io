@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <rect width="400" height="400" fill="#e8e8e8"/>
+  <circle cx="200" cy="155" r="62" fill="#bdbdbd"/>
+  <path d="M90 400c0-72 49-118 110-118s110 46 110 118z" fill="#bdbdbd"/>
+  <text x="200" y="380" font-family="system-ui, sans-serif" font-size="26" fill="#8a8a8a" text-anchor="middle">替换为你的照片</text>
+</svg>

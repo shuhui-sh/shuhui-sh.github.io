@@ -47,6 +47,28 @@ const fmt = (d: Date) =>
 
   <div class="divider"></div>
 
+  <section class="mb-10">
+    <div class="flex items-end justify-between mb-5">
+      <h2 class="text-2xl md:text-3xl font-bold">项目</h2>
+      <a class="link link-hover text-sm opacity-70" href="/projects">查看全部 →</a>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      {[1, 2, 3].map(() => (
+        <div class="card bg-base-100 border border-dashed border-base-300">
+          <figure class="h-28 bg-base-200/50 flex items-center justify-center">
+            <span class="text-2xl font-black opacity-20">{"</>"}</span>
+          </figure>
+          <div class="card-body p-4">
+            <h3 class="card-title text-sm opacity-60">待补充：项目名称</h3>
+            <p class="text-xs opacity-50">一句话说明项目做什么、你的角色与技术栈。</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
   <section>
     <div class="flex items-end justify-between mb-5">
       <h2 class="text-2xl md:text-3xl font-bold">最新文章</h2>

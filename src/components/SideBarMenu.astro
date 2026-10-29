@@ -1,4 +1,5 @@
 ---
+// TODO: 把 href 换成你的真实账号；不需要的可以直接删掉对应 <li>
 const { sideBarActiveItemID } = Astro.props;
 const activeClass = "bg-base-300";
 ---
@@ -6,6 +7,8 @@ const activeClass = "bg-base-300";
 <ul class="menu grow shrink menu-md overflow-y-auto">
     <li><a class="py-3 text-base" id="home" href="/">首页</a></li>
     <li><a class="py-3 text-base" id="blog" href="/blog/">文章</a></li>
+    <li><a class="py-3 text-base" id="projects" href="/projects">项目</a></li>
+    <li><a class="py-3 text-base" id="cv" href="/cv">简历</a></li>
     <li><a class="py-3 text-base" id="about" href="/about">关于</a></li>
     <li>
         <a class="py-3 text-base" href="https://github.com/shuhui-sh" target="_blank" rel="noopener">GitHub</a>

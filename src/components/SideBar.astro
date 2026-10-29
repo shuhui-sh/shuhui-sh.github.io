@@ -7,13 +7,14 @@ const { sideBarActiveItemID } = Astro.props;
 <div class="drawer-side z-40">
   <label for="my-drawer" class="drawer-overlay"></label>
   <aside class="px-2 pt-2 h-auto min-h-full w-[17rem] bg-base-200 text-base-content flex flex-col">
-    <div class="w-fit mx-auto mt-6 mb-6">
+    <div class="w-fit mx-auto mt-6 mb-5">
       <a href="/" class="no-underline">
-        <div
-          class="w-[6.5rem] h-[6.5rem] rounded-full bg-primary text-primary-content grid place-items-center text-5xl font-bold select-none transition ease-in-out hover:scale-[102%]"
-        >
-          C
-        </div>
+        <!-- 头像：替换 public/profile.svg 为你自己的照片即可（也可改成 .jpg/.png 并更新路径） -->
+        <img
+          src="/profile.svg"
+          alt="头像"
+          class="w-[6.5rem] h-[6.5rem] rounded-full object-cover mx-auto transition ease-in-out hover:scale-[102%]"
+        />
         <div class="text-center mt-3 font-semibold text-lg">碳基Agent</div>
         <div class="text-center text-xs opacity-60">Android · AI · 逆向</div>
       </a>

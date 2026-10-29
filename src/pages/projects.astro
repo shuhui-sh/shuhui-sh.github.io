@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// TODO: 用你的真实项目替换下面每一项
+// img 放在 public/ 下，例如 /projects/xxx.png；url 填 GitHub 或演示地址
+const projects = [
+  {
+    title: "待补充：项目一",
+    desc: "一句话说明这个项目解决什么问题、你负责哪部分、用了什么技术栈。",
+    img: "/placeholder.svg",
+    url: "#",
+    badge: "TODO",
+    tags: ["Android", "逆向"],
+  },
+  {
+    title: "待补充：项目二",
+    desc: "一句话说明这个项目解决什么问题、你负责哪部分、用了什么技术栈。",
+    img: "/placeholder.svg",
+    url: "#",
+    tags: ["AI", "Agent"],
+  },
+  {
+    title: "待补充：项目三",
+    desc: "一句话说明这个项目解决什么问题、你负责哪部分、用了什么技术栈。",
+    img: "/placeholder.svg",
+    url: "#",
+    tags: ["云游戏"],
+  },
+];
+---
+
+<BaseLayout title="项目" sideBarActiveItemID="projects">
+  <div class="mt-2 mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold mb-2">项目</h1>
+    <p class="opacity-60 text-sm">做过的东西、能拿出来看的东西。</p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    {projects.map((p) => (
+      <a
+        href={p.url}
+        class="group card bg-base-100 border border-base-300 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+      >
+        <figure class="h-44 overflow-hidden bg-base-200/60 flex items-center justify-center p-3">
+          <img
+            src={p.img}
+            alt={p.title}
+            loading="lazy"
+            class="max-w-full max-h-full object-contain rounded transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        </figure>
+        <div class="card-body p-5">
+          <h3 class="card-title text-base group-hover:text-primary transition-colors">
+            {p.title}
+            {p.badge && <span class="badge badge-secondary badge-sm">{p.badge}</span>}
+          </h3>
+          <p class="text-sm opacity-70 leading-relaxed">{p.desc}</p>
+          <div class="flex flex-wrap gap-1.5 mt-1">
+            {p.tags.map((t) => (
+              <span class="badge badge-outline badge-sm">{t}</span>
+            ))}
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
