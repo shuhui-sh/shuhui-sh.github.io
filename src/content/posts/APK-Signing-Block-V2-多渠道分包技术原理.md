@@ -2,7 +2,7 @@
 title: "APK Signing Block V2 多渠道分包技术原理"
 date: 2026-05-06
 description: "APK V2签名块位于ZIP内容与Central Directory之间，利用其不参与签名验证的特性，可在不破坏签名的情况下注入渠道信息，实现秒级生成上千渠道包。"
-tags: []
+tags: ['Android']
 category: "技术"
 source: "https://juejin.cn/post/7636666943860113418"
 ---

@@ -2,7 +2,7 @@
 title: "你在 XML 时代学的渲染优化，进了 Compose 大多不再是重点——Recomposition 才是新的战场"
 date: 2026-10-22
 description: "XML 时代的过度绘制、层级压平，到了 Compose 大多不再是重点——新战场是重组。本文用 Layout Inspector 定位问题，讲清触发与稳定性规则，四步修复搜索列表页，真机数据验证。"
-tags: []
+tags: ['Android', 'Compose']
 category: "技术"
 source: "https://juejin.cn/post/7699368463357755443"
 ---

@@ -2,7 +2,7 @@
 title: "CLI：AI Agent 真正的'手'——兼谈 CLI-Anything 如何让万物 Agent 化"
 date: 2026-04-04
 description: "厘清CLI在Agent工具链的定位，解析CLI-Anything自动化流水线，对比Android的ADB方案体系。"
-tags: []
+tags: ['Android', 'AI', 'Agent']
 category: "技术"
 source: "https://juejin.cn/post/7624447286865362984"
 ---

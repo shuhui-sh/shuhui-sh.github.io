@@ -106,9 +106,18 @@ def process(art):
             missing += 1
             img.replace_with(soup.new_string(""))
 
-    # 抓标签
-    tags = [a.get_text(strip=True) for a in soup.select('a[href*="/tag/"]')][:5]
-    tags = [t for t in dict.fromkeys(tags) if t]
+    # 抓分类（页面内嵌 JSON 的 category_name）与标题关键词
+    m = re.search(r'category:\{category_id:"\d+",category_name:"([^"]+)"', html)
+    tags = [m.group(1)] if m else []
+    for kw, tag in [('Claude Code', 'Claude Code'), ('Android', 'Android'), ('Compose', 'Compose'),
+                    ('逆向', '逆向'), ('插件化', '插件化'), ('Tinker', '插件化'), ('性能', '性能优化'),
+                    ('渲染', 'Compose'), ('Overdraw', '性能优化'), ('加固', '逆向'), ('MCP', 'MCP'),
+                    ('REA', 'REA'), ('OpenClaw', 'OpenClaw'), ('AI', 'AI'), ('Agent', 'Agent'),
+                    ('反射', 'Java'), ('ClassLoader', 'Android'), ('Magisk', 'Android'), ('Root', 'Android'),
+                    ('APK', 'Android'), ('内存', '性能优化'), ('启动', '性能优化')]:
+        if kw.lower() in title.lower() and tag not in tags:
+            tags.append(tag)
+    tags = tags[:5]
 
     md_text = md(str(body), heading_style="ATX", code_language_callback=code_lang,
                  bullets="-", strip=["a"] if False else None)

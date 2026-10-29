@@ -2,7 +2,7 @@
 title: "小米手机刷入Magisk获取Root权限"
 date: 2025-07-17
 description: "作为一个资深的Android开发工程师，如果没有自己的Root手机的话，犹如钦差大臣没有尚方宝剑一样。Android Root手机在逆向安全开发，自动化脚本测试，性能监控等方面有着巨大的作用。"
-tags: []
+tags: ['Android']
 category: "技术"
 source: "https://juejin.cn/post/7527868423193296959"
 ---

@@ -2,7 +2,7 @@
 title: "AI Agent 的外部连接层：MCP 协议原理、机制设计与实战开发"
 date: 2026-03-12
 description: "本文从为什么需要 MCP 讲起，逐步拆解其三角色架构、三大能力原语、传输方式与连接生命周期，再通过一个 *Python 实战案例带你从零搭建可运行的 MCP Server。"
-tags: []
+tags: ['人工智能', 'MCP', 'AI', 'Agent']
 category: "技术"
 source: "https://juejin.cn/post/7616025751747182598"
 ---

@@ -2,7 +2,7 @@
 title: "Android第一代加固技术原理详解（附源码）"
 date: 2025-08-30
 description: "所谓加固，其实就是通过一些手段隐藏业务代码实现的细节，增加反编译工具（如jadx等）对apk进行反编译，静态分析业务代码的难度。 ​"
-tags: []
+tags: ['Android', '逆向']
 category: "技术"
 source: "https://juejin.cn/post/7543901300719681570"
 ---

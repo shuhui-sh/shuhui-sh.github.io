@@ -2,7 +2,7 @@
 title: "AI 当逆向工程师：Claude Code 自主分析 APK 和 so 文件，解决 Unity 插件化启动崩溃"
 date: 2026-03-29
 description: "一次真实的 AI 辅助逆向实战：用 Claude Code 排查 Unity 插件化 APK 启动崩溃，AI 自主分析 so 文件、对比目录结构、迭代修复，4 轮迭代删掉 179MB 冗余资源。"
-tags: []
+tags: ['人工智能', 'Claude Code', '逆向', '插件化', 'AI']
 category: "技术"
 source: "https://juejin.cn/post/7622139072376684579"
 ---

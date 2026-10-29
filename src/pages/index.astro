@@ -5,15 +5,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
+const tagCount = new Set(posts.flatMap((p) => p.data.tags)).size;
 
 const fmt = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 ---
 
 <BaseLayout title="碳基Agent">
-  <section class="intro">
+  <section class="hero">
     <h1>碳基Agent</h1>
     <p>Android 逆向 · 云游戏 · AI 工程，记录踩过的坑和想明白的事。</p>
+    <div class="hero-stats">
+      <span><b>{posts.length}</b> 篇文章</span>
+      <span><b>{tagCount}</b> 个标签</span>
+    </div>
   </section>
 
   <div class="filter">
@@ -29,16 +34,18 @@ const fmt = (d: Date) =>
     <ul class="post-list">
       {posts.map((post) => (
         <li>
-          <div class="post-item-head">
-            <a class="post-title" href={`/posts/${post.id}/`}>{post.data.title}</a>
-            <span class="post-date">{fmt(post.data.date)}</span>
-          </div>
-          {post.data.description && <p class="post-desc">{post.data.description}</p>}
-          {post.data.tags.length > 0 && (
-            <div class="post-tags">
-              {post.data.tags.slice(0, 5).map((t) => <span>#{t}</span>)}
+          <a class="post-card" href={`/posts/${post.id}/`}>
+            <div class="post-row">
+              <h2>{post.data.title}</h2>
+              <time class="post-date" datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
             </div>
-          )}
+            {post.data.description && <p class="post-desc">{post.data.description}</p>}
+            {post.data.tags.length > 0 && (
+              <div class="post-tags">
+                {post.data.tags.slice(0, 5).map((t) => <span class="tag-pill">#{t}</span>)}
+              </div>
+            )}
+          </a>
         </li>
       ))}
     </ul>

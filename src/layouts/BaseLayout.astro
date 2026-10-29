@@ -10,7 +10,7 @@ interface Props {
 const { title, description = 'Android 逆向、云游戏、AI 工程实践笔记' } = Astro.props;
 const siteName = '碳基Agent';
 const fullTitle = title === siteName ? title : `${title} · ${siteName}`;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.com');
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://shuhui-sh.github.io');
 ---
 
 <!doctype html>
@@ -22,25 +22,80 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.com
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><text y='.9em' x='50%' text-anchor='middle' font-size='62' fill='white' font-family='monospace'>C</text></svg>" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="article" />
     <meta name="generator" content={Astro.generator} />
   </head>
   <body>
-    <div class="wrap">
+    <div class="page">
       <Header />
       <main>
         <slot />
       </main>
       <footer class="site-footer">
-        <span>© {new Date().getFullYear()} {siteName}</span>
-        <span>
+        <span>© {new Date().getFullYear()} 碳基Agent</span>
+        <span class="footer-links">
           <a href="/rss.xml">RSS</a>
-          <span> · </span>
-          <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/shuhui-sh" target="_blank" rel="noopener">GitHub</a>
         </span>
       </footer>
     </div>
+
+    <script>
+      // Mermaid：Shiki 会把 ```mermaid 当 plaintext，这里按语法特征识别后交给 mermaid 渲染
+      const MERMAID_RE =
+        /^\s*(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|gantt|pie|journey|mindmap|timeline|quadrantChart|gitGraph|block-beta|packet-beta|architecture-beta|sankey-beta|xychart-beta)\b/;
+
+      const nodes: HTMLElement[] = [];
+      document.querySelectorAll('.article-body pre').forEach((pre) => {
+        const code = pre.querySelector('code')?.innerText ?? pre.textContent ?? '';
+        if (MERMAID_RE.test(code)) {
+          const div = document.createElement('div');
+          div.className = 'mermaid';
+          div.textContent = code;
+          pre.replaceWith(div);
+          nodes.push(div);
+        }
+      });
+
+      if (nodes.length) {
+        import('mermaid').then(async ({ default: mermaid }) => {
+          const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: dark ? 'dark' : 'neutral',
+            fontFamily: 'inherit',
+            securityLevel: 'loose',
+            flowchart: { htmlLabels: true, curve: 'basis' },
+          });
+          try {
+            await mermaid.run({ nodes });
+          } catch (e) {
+            console.warn('mermaid render failed', e);
+          }
+        });
+      }
+
+      // 代码块复制按钮
+      document.querySelectorAll('.article-body pre').forEach((pre) => {
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.type = 'button';
+        btn.textContent = '复制';
+        btn.addEventListener('click', async () => {
+          const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+          try {
+            await navigator.clipboard.writeText(code);
+            btn.textContent = '已复制';
+          } catch {
+            btn.textContent = '失败';
+          }
+          setTimeout(() => (btn.textContent = '复制'), 1600);
+        });
+        pre.appendChild(btn);
+      });
+    </script>
   </body>
 </html>

@@ -2,7 +2,7 @@
 title: "Android 渲染优化实战：从看懂 Overdraw 到用 ConstraintLayout 一套布局适配所有屏幕"
 date: 2026-07-23
 description: "本文是「Android 应用性能优化」系列第一篇。该系列将介绍工作中常年累月积累的优化知识和经验，算是对过往的工作内容做一个梳理和总结，以及在AI时代方便蒸馏成可无限复制的技能。"
-tags: []
+tags: ['Android', 'Compose', '性能优化', 'AI']
 category: "技术"
 source: "https://juejin.cn/post/7665563875711270975"
 ---

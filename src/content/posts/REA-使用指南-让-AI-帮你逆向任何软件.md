@@ -2,7 +2,7 @@
 title: "REA 使用指南：让 AI 帮你逆向任何软件"
 date: 2026-10-13
 description: "REA是13万star的MCP逆向工具包，让AI助手具备逆向分析能力，用自然语言问出任意软件的实现原理。本文详解接入配置、Ubuntu实测全流程，并深挖Notion剪贴板桥官方案例。"
-tags: []
+tags: ['人工智能', '逆向', 'REA', 'AI']
 category: "技术"
 source: "https://juejin.cn/post/7695988678804357146"
 ---

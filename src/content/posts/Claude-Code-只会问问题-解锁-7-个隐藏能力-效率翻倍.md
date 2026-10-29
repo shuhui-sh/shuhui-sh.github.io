@@ -2,7 +2,7 @@
 title: "Claude Code 只会问问题？解锁 7 个隐藏能力，效率翻倍"
 date: 2026-03-22
 description: "Claude Code 本质上是一个 AI 代理编排框架——可以连接外部工具（数据库、GitHub、浏览器）、把复杂任务分拆给多个专门的 AI 代理并行处理、用可复用的工作流自动化重复操作，并支持团队"
-tags: []
+tags: ['人工智能', 'Claude Code']
 category: "技术"
 source: "https://juejin.cn/post/7619245854760009743"
 ---

@@ -2,7 +2,7 @@
 title: "Android应用程序启动流程详解（含源码）"
 date: 2025-07-25
 description: "Android应用程序启动流程详解（含源码） 概述 Android应用程序启动流程是理解壳程序加载被保护程序的核心知识。"
-tags: []
+tags: ['Android', '性能优化']
 category: "技术"
 source: "https://juejin.cn/post/7530911563831296010"
 ---

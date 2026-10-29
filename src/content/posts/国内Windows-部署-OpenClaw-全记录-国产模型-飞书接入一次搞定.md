@@ -2,7 +2,7 @@
 title: "国内Windows 部署 OpenClaw 全记录：国产模型 + 飞书接入一次搞定"
 date: 2026-03-05
 description: "踩了一个月的坑，换过五个国产模型，才让 OpenClaw 在 Windows 上真正跑起来。从 WSL 环境搭建、国内镜像配置，到模型选型、浏览器控制，每个坑都替你趟过了。"
-tags: []
+tags: ['人工智能', 'OpenClaw']
 category: "技术"
 source: "https://juejin.cn/post/7613330850831777842"
 ---

@@ -2,7 +2,7 @@
 title: "快速Dump应用运行时内存"
 date: 2022-12-04
 description: "windows的cmd环境下，使用toybox ulimit命令快速进行对应用进行运行时内存core_dump。"
-tags: []
+tags: ['Android', '性能优化']
 category: "技术"
 source: "https://juejin.cn/post/7173319078667354120"
 ---

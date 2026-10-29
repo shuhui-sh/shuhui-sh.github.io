@@ -2,7 +2,7 @@
 title: "用 Tinker 热更新反向实现插件化：两个独立 APK 合二为一的原理详解"
 date: 2026-10-26
 description: "用 Tinker 热更新反向实现插件化：编译期把游戏整包（插件）的组件与最小资源嫁接进云游戏宿主，运行期注入差分补丁，让两个独立 APK 合二为一，不 Hook AMS/PMS，目标包零源码改造。"
-tags: []
+tags: ['Android', '插件化']
 category: "技术"
 source: "https://juejin.cn/post/7700462324587970570"
 ---

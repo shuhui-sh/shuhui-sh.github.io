@@ -2,7 +2,7 @@
 title: "Android第二代加固技术原理详解（附源码）"
 date: 2026-01-01
 description: "一代加固存在一个致命缺陷：解密后的DEX文件需要落地到文件系统。为了解决这一安全隐患，二代加固应运而生——核心思想是DEX不落地，直接在内存中加载。"
-tags: []
+tags: ['Android', '逆向']
 category: "技术"
 source: "https://juejin.cn/post/7589935326781669410"
 ---

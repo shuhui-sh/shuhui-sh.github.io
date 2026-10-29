@@ -2,7 +2,7 @@
 title: "Android第三代加固技术原理详解（附源码）"
 date: 2026-04-19
 description: "Android三代加固通过代码抽取+运行时指令回填实现保护，使用ByteHook禁用dex2oat，Dobby Hook LoadMethod按需恢复指令，支持Android 7-15。"
-tags: []
+tags: ['Android', '逆向']
 category: "技术"
 source: "https://juejin.cn/post/7629931535735406633"
 ---
