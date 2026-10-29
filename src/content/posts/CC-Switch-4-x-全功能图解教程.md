@@ -3,6 +3,7 @@ title: "CC Switch 4.x 全功能图解教程"
 date: 2026-10-23
 description: "1. 界面总览 2. 三种连接模式 3. 供应商管理 4. 本地路由、故障转移与聚合 5. MCP 服务器 6. 提示词（Prompts） 7. Skills 8. 会话管理器 9. 授权中心 10."
 tags: ['工具', 'Claude Code']
+draft: true
 category: "技术"
 ---
 > **实拍版本**：CC Switch 4.0.18（Windows 11）

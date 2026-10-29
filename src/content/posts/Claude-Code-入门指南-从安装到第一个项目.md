@@ -3,6 +3,7 @@ title: "Claude Code 入门指南：从安装到第一个项目"
 date: 2026-02-11
 description: "Claude Code 是 Anthropic 推出的 AI 编程助手，它可以： 与传统的代码补全工具不同，Claude Code 是一个真正的 AI 结对编程伙伴，能够理解上下文、进行多步推理，并主"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 本文将带你从零开始使用 Claude Code，完成安装配置并创建你的第一个 AI 辅助编程项目。

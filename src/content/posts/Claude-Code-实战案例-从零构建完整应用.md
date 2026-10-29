@@ -3,6 +3,7 @@ title: "Claude Code 实战案例：从零构建完整应用"
 date: 2026-04-02
 description: "1. 案例概览 2. 案例一：CLI 工具开发 3. 案例二：全栈 Web 应用 4. 案例三：遗留代码重构"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 汇总海外开发者使用 Claude Code 的真实项目案例

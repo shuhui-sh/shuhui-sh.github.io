@@ -3,6 +3,7 @@ title: "Claude Code 最佳实践：10个提升效率的技巧"
 date: 2026-02-11
 description: "Claude Code 是一个强大的工具，但要发挥它的全部潜力，需要掌握正确的使用方法。本文总结了海外开发者社区分享的10个最佳实践，帮助你更高效地使用 Claude Code。"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 掌握这10个技巧，让你的 Claude Code 使用效率提升10倍！

@@ -3,6 +3,7 @@ title: "OpenClaw 多 Agent 实战教程"
 date: 2026-04-02
 description: "1. 架构概览 2. 多群组 × 独立 Agent 3. 同群组内多 Agent 协同"
 tags: ['AI', 'Agent', 'OpenClaw']
+draft: true
 category: "技术"
 ---
 > Telegram 多群组 × 多 Agent 角色 × 工作流产物共享｜适用于 OpenClaw v2026.x

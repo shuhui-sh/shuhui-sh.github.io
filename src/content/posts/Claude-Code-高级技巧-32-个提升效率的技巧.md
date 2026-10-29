@@ -3,6 +3,7 @@ title: "Claude Code 高级技巧：32 个提升效率的技巧"
 date: 2026-04-02
 description: "1. 基础技巧 2. 工作流优化 3. 高级配置 4. 极客技巧 自定义 Claude Code 底部状态栏，显示有用信息："
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 汇编自海外资深用户的实战经验

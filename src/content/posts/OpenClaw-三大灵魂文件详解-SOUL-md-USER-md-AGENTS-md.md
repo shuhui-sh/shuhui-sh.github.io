@@ -3,6 +3,7 @@ title: "OpenClaw 三大灵魂文件详解：SOUL.md、USER.md、AGENTS.md"
 date: 2026-04-02
 description: "OpenClaw 最独特的设计之一，是用 Markdown 文件来定义 Agent 的一切行为，而不是在代码里硬编码。这些文件住在 ~/."
 tags: ['AI', 'Agent', 'OpenClaw']
+draft: true
 category: "技术"
 ---
 > 整合官方文档、VerySmallWoods、TuBaiBai Blog、HackMD、amankhan1.substack 等多份热门教程，含完整可复制示例。

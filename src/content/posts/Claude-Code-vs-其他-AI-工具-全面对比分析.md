@@ -3,6 +3,7 @@ title: "Claude Code vs 其他 AI 工具：全面对比分析"
 date: 2026-04-02
 description: "1. 工具概述 2. 功能对比 3. 使用场景分析 4. 成本对比 5. 真实用户反馈"
 tags: ['Claude Code', 'AI']
+draft: true
 category: "技术"
 ---
 > 海外开发者视角下的 AI 编程工具深度对比

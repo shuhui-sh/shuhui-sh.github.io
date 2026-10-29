@@ -3,6 +3,7 @@ title: "云手机定制与风控对抗系列 (一)：CVD 是什么？从零搭�
 date: 2026-05-27
 description: "做逆向分析或安全研究时，你一定遇到过这些痛点： CVD (Cuttlefish Virtual Device) 正是解决这些问题的方案。"
 tags: ['云游戏', 'Android']
+draft: true
 category: "技术"
 ---
 > 系列受众：有一定 Android 逆向基础（会用 JADX/Frida/apktool），但对 AOSP 编译、内核修改、风控对抗链路不熟悉的读者。

@@ -3,6 +3,7 @@ title: "OpenClaw 的出现，就像当年的 DeepSeek"
 date: 2026-04-02
 description: "我可能是国内最早一批跟进 OpenClaw 的用户之一。 从它在海外兴起，到一个月后在国内开始有人讨论并风靡全民，这整个过程我算是完整经历了。"
 tags: ['OpenClaw']
+draft: true
 category: "生活"
 ---
 > 改变行业的东西，在最开始永远长得像一个普通产品。

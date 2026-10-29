@@ -3,6 +3,7 @@ title: "Windows 11 环境下 WSL 安装 OpenClaw 完整指南"
 date: 2026-04-02
 description: "本教程提供在 Windows 11 WSL 环境下安装和配置 OpenClaw 的完整流程，涵盖从环境初始化到国内 API 配置的全部步骤。"
 tags: ['OpenClaw']
+draft: true
 category: "技术"
 ---
 本教程提供在 Windows 11 WSL 环境下安装和配置 OpenClaw 的完整流程，涵盖从环境初始化到国内 API 配置的全部步骤。

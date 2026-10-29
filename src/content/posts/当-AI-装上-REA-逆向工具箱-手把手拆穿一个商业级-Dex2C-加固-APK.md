@@ -3,6 +3,7 @@ title: "当 AI 装上 REA 逆向工具箱：手把手拆穿一个商业级 Dex2C
 date: 2026-10-27
 description: "很多做 Android 开发或移动安全的同学，第一次逆向商业 App 时都会经历同一个崩溃瞬间： 你拿到了一个线上发行的 APK，满怀信心地拖进 JADX-GUI。"
 tags: ['逆向', 'Android', 'REA', 'AI']
+draft: true
 category: "技术"
 ---
 > **项目地址**：[https://github.com/morluto/rea](https://github.com/morluto/rea) ｜ MIT 开源

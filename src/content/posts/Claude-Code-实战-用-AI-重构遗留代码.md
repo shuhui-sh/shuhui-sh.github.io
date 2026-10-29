@@ -3,6 +3,7 @@ title: "Claude Code 实战：用 AI 重构遗留代码"
 date: 2026-02-11
 description: "假设我们接手了一个 5 年前的 Node.js 项目，代码存在以下问题： 与 Claude Code 协作，我们采用渐进式重构策略： 运行测试确保通过： 1. 渐进式重构：每次只改一个方面，降低风险"
 tags: ['Claude Code', 'AI']
+draft: true
 category: "技术"
 ---
 > 通过一个真实的遗留代码重构案例，展示如何利用 Claude Code 安全、高效地改善代码质量。

@@ -3,6 +3,7 @@ title: "国内安装 Claude Code 并切换使用国内大模型 API：完整指�
 date: 2026-04-02
 description: "Claude Code 是 Anthropic 在 2025 年推出的革命性 AI 工程工具。"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > **阅读提示**：本文将手把手教你安装 Claude Code，了解它的真实能力边界，并配置使用 DeepSeek、阿里百炼、智谱 GLM 等国内大模型 API，让你以更低的成本享受 AI 工程助手带来的效率革命。

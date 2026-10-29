@@ -3,6 +3,7 @@ title: "Claude Code 高级功能：MCP 协议与自定义工具开发"
 date: 2026-02-11
 description: "MCP（Model Context Protocol） 是 Anthropic 设计的开放协议，允许 AI 模型与外部工具和数据源进行标准化交互。 Claude Code 内置了多个 MCP 服务器："
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 深入了解 Claude Code 的 MCP（Model Context Protocol）协议，学习如何开发自定义工具扩展 AI 的能力边界。

@@ -3,6 +3,7 @@ title: "MCP_深度技术教程_发布"
 date: 2026-04-02
 description: ""
 tags: []
+draft: true
 category: "技术"
 ---
 > > 当我们让 AI 助手"查一下知识库"或"在 Jira 上建个工单"时，背后需要一套标准方式让 AI 与外部工具对话——这就是 **MCP（Model Context Protocol）** 要解决的问题。它的定位类似于 AI 世界的"USB 接口"：工具开发者按协议实现一次 Server，所有支持 MCP 的 AI 应用即可即插即用，告别"每换一个平台就重写集成代码"的困境。

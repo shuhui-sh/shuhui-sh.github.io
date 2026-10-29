@@ -3,6 +3,7 @@ title: "Android SO 热修复技术深度解析"
 date: 2026-06-01
 description: "SO 热修复与 Java 热修复有一个根本性差异： 结论：dlclose 调用后，SO 的代码段和数据段依然在进程地址空间中，所有已解析的 GOT/PLT 依然指向旧 SO 的地址。"
 tags: ['Android']
+draft: true
 category: "技术"
 ---
 > 聚焦 DT_NEEDED 依赖链、Linker Namespace 隔离与工程对抗方案。

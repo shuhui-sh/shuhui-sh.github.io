@@ -3,6 +3,7 @@ title: "Claude Code MCP 协议完全指南"
 date: 2026-04-02
 description: "1. 什么是 MCP？ 2. MCP 传输类型 3. 安装和配置 MCP 4. 常用 MCP 服务器"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > Model Context Protocol - 让 Claude 连接外部世界

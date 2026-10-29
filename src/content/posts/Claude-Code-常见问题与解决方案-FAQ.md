@@ -3,6 +3,7 @@ title: "Claude Code 常见问题与解决方案 (FAQ)"
 date: 2026-02-11
 description: "问题描述： 解决方案： 这些是依赖库的警告，不影响使用。Claude Code 团队会在后续版本更新依赖。如果强迫症想消除警告： 问题描述： 解决方案： 方法一：运行时登录"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 收集整理 Claude Code 使用过程中的常见问题，提供详细的解决方案。

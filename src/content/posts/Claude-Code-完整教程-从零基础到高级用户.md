@@ -3,6 +3,7 @@ title: "Claude Code 完整教程：从零基础到高级用户"
 date: 2026-04-02
 description: "1. 什么是 Claude Code？ 2. 安装与设置 3. 核心功能与命令 4. CLAUDE.md 项目记忆系统"
 tags: ['Claude Code']
+draft: true
 category: "技术"
 ---
 > 汇总自海外 2026 年最新 Claude Code 教程资源

@@ -3,6 +3,7 @@ title: "OpenClaw WSL 安装指南 - 补充资料"
 date: 2026-04-02
 description: "OpenClaw 的 Browser 技能需要 Chrome 或 Brave 浏览器。WSL2 支持 WSLg，可以原生显示 Linux GUI 应用。"
 tags: ['OpenClaw']
+draft: true
 category: "技术"
 ---
 > 本文档是对《OpenClaw-WSL安装指南.md》的补充，涵盖启动命令、浏览器扩展配置等高级内容。

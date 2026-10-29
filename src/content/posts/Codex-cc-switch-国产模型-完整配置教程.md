@@ -3,6 +3,7 @@ title: "Codex + cc-switch + 国产模型 完整配置教程"
 date: 2026-06-01
 description: "1. 背景知识 2. 架构总览 3. 环境准备 4. 安装 Codex CLI 5. 安装并配置 cc-switch"
 tags: []
+draft: true
 category: "技术"
 ---
 > 适用环境：Windows 10/11 · Codex CLI v0.135.0 · cc-switch v3.16.0 · DeepSeek V4 Pro

@@ -3,6 +3,7 @@ title: "Claude Code vs GitHub Copilot：AI 编程助手深度对比"
 date: 2026-02-11
 description: "示例对话： 典型场景： 任务：创建一个带有缓存、重试和超时的 HTTP 客户端 Claude Code 生成： GitHub Copilot 生成（需要多次交互和手动补充）："
 tags: ['Claude Code', 'AI']
+draft: true
 category: "技术"
 ---
 > 两大 AI 编程助手各有千秋，本文从多个维度深入对比，帮你选择最适合的工具。

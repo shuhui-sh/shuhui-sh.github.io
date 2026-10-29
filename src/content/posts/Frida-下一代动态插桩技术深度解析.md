@@ -3,6 +3,7 @@ title: "Frida：下一代动态插桩技术深度解析"
 date: 2026-06-01
 description: "Frida 是一个世界级的动态插桩（Dynamic Instrumentation）工具包，由挪威安全研究员 Ole André Vadla Ravnås（@oleavr）创建。"
 tags: []
+draft: true
 category: "技术"
 ---
 ## 一、什么是 Frida

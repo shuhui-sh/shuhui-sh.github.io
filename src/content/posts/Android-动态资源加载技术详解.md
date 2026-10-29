@@ -3,6 +3,7 @@ title: "Android 动态资源加载技术详解"
 date: 2026-06-01
 description: "Android 应用的资源通常随 APK 一起编译打包，在运行时通过 Resources / AssetManager 体系访问。然而现实中有大量场景需要在不发版的前提下，于运行时动态加载额外的资源："
 tags: ['Android']
+draft: true
 category: "技术"
 ---
 > 从底层原理到工程实践，系统梳理 Android 平台动态资源加载的技术体系。

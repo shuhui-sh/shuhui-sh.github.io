@@ -3,6 +3,7 @@ title: "从'AI 老是打断我'到'任务直接跑完'：我的 OpenClaw 一个�
 date: 2026-04-02
 description: "我最近在折腾 AI 编程助手，OpenClaw 是其中让我花时间最多的一个——不是因为它不好，而是从安装到真正跑起来，坑踩得不少。"
 tags: ['OpenClaw', 'AI']
+draft: true
 category: "技术"
 ---
 ## 引言

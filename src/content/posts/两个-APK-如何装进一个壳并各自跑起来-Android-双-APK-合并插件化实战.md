@@ -3,6 +3,7 @@ title: "两个 APK，如何装进一个壳并各自跑起来：Android 双 APK �
 date: 2026-10-27
 description: "APK 确实是 ZIP，但“都是 ZIP”只说明容器格式相同，不代表应用语义可以相加。"
 tags: ['插件化', 'Android']
+draft: true
 category: "技术"
 ---
 > 手头有两个能够独立安装、独立运行的 APK：一个负责微端云游戏，一个负责完整游戏。能不能只给用户一个安装包，在壳里按需进入两套代码和两套资源？

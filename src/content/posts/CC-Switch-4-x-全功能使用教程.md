@@ -3,6 +3,7 @@ title: "CC Switch 4.x 全功能使用教程"
 date: 2026-10-23
 description: "1. 认识 CC Switch 2. 三种连接模式：直连 / 路由 / 聚合 3. 供应商管理（核心） 4. 本地路由与高可用 5."
 tags: ['工具', 'Claude Code']
+draft: true
 category: "技术"
 ---
 > **适用版本**：CC Switch 4.0.x（本机实测 4.0.18）

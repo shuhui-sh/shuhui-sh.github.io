@@ -3,6 +3,7 @@ title: "OpenClaw 最佳实践：协同与隔离完全指南"
 date: 2026-04-02
 description: "1. 核心概念与心智模型 2. 四个维度的隔离边界 3. 群组的组织哲学 4. Agent 的角色设计"
 tags: ['OpenClaw']
+draft: true
 category: "技术"
 ---
 > 如何组织 Telegram 群组、Agent、角色与工作流，发挥 OpenClaw 的最大效用

@@ -3,6 +3,7 @@ title: "Clash Verge Rev 完整使用指南"
 date: 2026-06-08
 description: "1. 软件概述 2. 下载与安装 3. 界面布局 4. 订阅管理 5. 代理模式"
 tags: []
+draft: true
 category: "技术"
 ---
 > **版本**：v2.5.1 (2026年5月20日)  

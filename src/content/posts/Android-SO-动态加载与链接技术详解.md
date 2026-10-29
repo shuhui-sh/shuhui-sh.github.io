@@ -3,6 +3,7 @@ title: "Android SO 动态加载与链接技术详解"
 date: 2026-06-01
 description: "Android 系统中，C/C++ 代码编译为 .so（Shared Object）文件，供 Java 层通过 JNI 调用。"
 tags: ['Android']
+draft: true
 category: "技术"
 ---
 > 从 Java 层 `System.loadLibrary` 到底层 ELF 链接器，系统梳理 Android 原生库（SO）的加载、链接与动态化方案。

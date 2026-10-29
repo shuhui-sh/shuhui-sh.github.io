@@ -3,6 +3,7 @@ title: "Jetpack Compose 常用组件与控件零基础入门指南"
 date: 2026-09-04
 description: "1. Compose 是什么 2. 环境准备 3. 第一个 Compose 界面 4. Modifier：组件的'装饰管道'"
 tags: ['Compose']
+draft: true
 category: "技术"
 ---
 > 本文面向**完全没接触过 Compose** 的读者。不需要任何 Compose 前置知识，只要会一点 Kotlin 基础语法（甚至只会别的编程语言）就能读懂。读完你将能够：

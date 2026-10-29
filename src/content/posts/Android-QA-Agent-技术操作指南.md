@@ -3,6 +3,7 @@ title: "Android QA Agent 技术操作指南"
 date: 2026-04-08
 description: "android-qa-agent 是一个基于 Claude Code + ADB 的 Android UI 自动化测试工具。"
 tags: ['AI', 'Agent', 'Android']
+draft: true
 category: "技术"
 ---
 ## 一、概述
