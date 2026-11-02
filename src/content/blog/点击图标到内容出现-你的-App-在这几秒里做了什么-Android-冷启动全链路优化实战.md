@@ -3,6 +3,7 @@ title: "点击图标到内容出现，你的 App 在这几秒里做了什么：A
 description: "从点击图标到第一帧，拆解 Android 冷启动全链路：三级工具定位耗时，四刀优化 SDK 初始化、ContentProvider、主线程任务与 Baseline Profile，双真机验收。"
 pubDate: "2026-10-30"
 tags: ['Android', 'Android Studio', '性能优化']
+heroImage: "/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot01_am_start_and_displayed.png"
 ---
 
 > 本文同步自掘金首发：[juejin.cn/post/7702013601234436132](https://juejin.cn/post/7702013601234436132)
@@ -66,7 +67,7 @@ Complete
 
 （日志的 tag 随系统版本不同，Android 9 及以下为 `ActivityManager`，Android 10 及以上为 `ActivityTaskManager`，直接 `adb logcat -d | grep Displayed` 即可。）
 
-![am start -W 的输出与 Logcat Displayed 日志实测](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/ca6d392bce55400dbc56fd60270282f5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=wefz2xxW4YRYlZcDEF0EvzcH9%2BY%3D)
+![am start -W 的输出与 Logcat Displayed 日志实测](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot01_am_start_and_displayed.png)
 
 这个数字到底算快还是慢？[Android 官方文档（App startup time）](https://developer.android.com/topic/performance/issues/launch-time)有一条明确的红线：Android vitals 把**冷启动 ≥ 5 秒**视为过长（温启动 ≥ 2 秒，热启动 ≥ 1.5 秒）。而 Vitals 默认统计的核心指标，是 **TTID（Time To Initial Display，首帧显示时间）**。在体感层面，一旦冷启动超过 **1 秒**，用户就能明显感知到过渡等待。
 
@@ -205,7 +206,7 @@ class DemoApp : Application() {
 
 怎么把它们揪出来？在 Android Studio 里打开 `app/src/main/AndroidManifest.xml`，切换到底部的 **Merged Manifest** 标签页（或者直接查看构建产物 `app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml`），搜索 `<provider>`：
 
-![Merged Manifest 中的 provider 列表与来源分析](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/1f854065c9d24248a6cf8bf90676f02d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=fgkrk1o9WVPgYXEQNrUdvfWWRpM%3D)
+![Merged Manifest 中的 provider 列表与来源分析](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot02_merged_manifest_providers.png)
 
 可以看到，在我们的演示工程中，虽然业务主模块的 `AndroidManifest.xml` 里一个 `<provider>` 都没写，合并后的清单里却赫然躺着 **3 个 `<provider>`（涉及 6 个初始化组件）**：两个来自第三方 SDK 模块（`FakePushInitProvider`、`FakeAnalyticsInitProvider`），还有一个是 Jetpack App Startup 的 `InitializationProvider`（内部又挂载了 `WorkManager`、`EmojiCompat`、`ProcessLifecycle`、`ProfileInstaller` 四个初始化器）。
 
@@ -257,7 +258,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 在动手改一行代码之前，我们先在 `step0-baseline` 版本上抓取 Perfetto trace 并运行 10 次冷启动基准测试。
 
-![Step 0 优化前冷启动的 Perfetto 主线程时间线拆解](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/35044eaf8a4b468294b4d26904d6b04d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=rt1VTSs3ZFup4oSaZCwjyH0VEC8%3D)
+![Step 0 优化前冷启动的 Perfetto 主线程时间线拆解](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot03_perfetto_step0.png)
 
 把两台真机上 Step 0 各阶段的实测中位数整理出来：
 
@@ -375,7 +376,7 @@ Step 1 把 `Application.onCreate` 压到了 48.3ms，但回头看 Perfetto，前
 
 我们把 Merged Manifest 里的所有 `<provider>` 及其内部 `<meta-data>` 拉出一张表，逐一审视去留：
 
-![Merged Manifest Provider 逐项排查与治理对照表](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/f40576dac2cb44b18de304deba5c77c8~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=t8PzGf2KxjgpuB92Mi%2FMv5at5Zs%3D)
+![Merged Manifest Provider 逐项排查与治理对照表](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot04_provider_list_annotated.png)
 
 不同来源的 Provider，治理手段完全不同，分为三种情况：
 
@@ -601,7 +602,7 @@ CompilationMode.Partial(): TTID 中位数 = 238.0ms（范围 224.0–272.0ms）
 
 同时，我们还验证了 Step 1 的 P2 地图懒加载按钮与 Step 2 的 WorkManager 按需同步按钮，功能 100% 正常可用：
 
-![StartupDemo 真机运行与按需初始化功能验证](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/81068b5c3e9f42a18506251b7c590587~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=w2THbOsmk8HtUyab9GRnG3wB8gs%3D)
+![StartupDemo 真机运行与按需初始化功能验证](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot07_device_verification.png)
 
 ---
 
@@ -633,9 +634,9 @@ CompilationMode.Partial(): TTID 中位数 = 238.0ms（范围 224.0–272.0ms）
 | **`Activity.onCreate`** | 226.8ms | 62.2ms | 59.7ms | **9.7ms** | 10.3ms | **11.2ms** | **-215.6ms (-95.1%)** |
 | **首次绘制 (`FirstDraw`)** | 214.1ms | 168.3ms | 118.2ms | 162.3ms | 102.6ms | **114.6ms** | **-99.5ms (-46.5%)** |
 
-![优化前后的 Perfetto 主线程时间线对比（Step 0 vs Step 4）](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/e4de093cfc1c42b687112c07333aaa9d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=kjk%2B9FogtXR7xurcuibk416xba0%3D)
+![优化前后的 Perfetto 主线程时间线对比（Step 0 vs Step 4）](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot05_perfetto_step0_vs_step4.png)
 
-![Macrobenchmark 双真机量化对比与各阶段耗时拆解](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/1c9caafd06194dbe94f55f6bc23f5212~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAg56Kz5Z-6QWdlbnQ=:q75.awebp?rk3s=f64ab15b&x-expires=1793934763&x-signature=u%2FUoNFG6AmHZvYtXKmdW36xB7tM%3D)
+![Macrobenchmark 双真机量化对比与各阶段耗时拆解](/images/点击图标到内容出现-你的-App-在这几秒里做了什么-Android-冷启动全链路优化实战/shot06_macrobenchmark_none_vs_partial.png)
 
 把两台真机的四刀演进放在一起看，冷启动优化的全局图景一目了然：
 
