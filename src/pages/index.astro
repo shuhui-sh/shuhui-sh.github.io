@@ -54,7 +54,27 @@ const fmt = (d: Date) =>
       <a class="link link-hover text-sm opacity-70" href="/projects">查看全部 →</a>
     </div>
     <div class="grid gap-4 md:grid-cols-3">
-      {[1, 2, 3].map(() => (
+      <a
+        href="https://gethaulreel.com"
+        class="group card bg-base-100 border border-base-300 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+      >
+        <figure class="h-28 overflow-hidden bg-base-200/60 flex items-center justify-center p-2">
+          <img
+            src="/projects/haulreel.png"
+            alt="HaulReel"
+            loading="lazy"
+            class="max-w-full max-h-full object-contain rounded transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        </figure>
+        <div class="card-body p-4">
+          <h3 class="card-title text-sm group-hover:text-primary transition-colors">
+            HaulReel
+            <span class="badge badge-secondary badge-sm">Live</span>
+          </h3>
+          <p class="text-xs opacity-70">面向电商卖家的 AI 产品视频生成 SaaS：一张产品图，约 1 分钟生成带货视频。</p>
+        </div>
+      </a>
+      {[2, 3].map(() => (
         <div class="card bg-base-100 border border-dashed border-base-300">
           <figure class="h-28 bg-base-200/50 flex items-center justify-center">
             <span class="text-2xl font-black opacity-20">{"</>"}</span>
