@@ -1,34 +1,175 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-// TODO: 用你的真实经历替换
-const experience = [
+const profile = {
+  name: "陈树辉",
+  title: "资深移动端开发工程师",
+  tags: ["Android", "SDK", "AI Agent"],
+  location: "广州",
+  phone: "18028669867",
+  email: "18028669867@163.com",
+  blog: "https://shuhui-sh.github.io",
+  summary: "10 年 Android 开发经验：社区 App → 云游戏微端平台 → SDK → AI Agent 工程化。擅长平台化架构与体系化性能优化，最近在三端（Android / HarmonyOS）与 AI 工程实践方向持续深耕。",
+};
+
+const stats = [
+  { value: "10 亿+", label: "云游戏流水支撑" },
+  { value: "3,039 万", label: "内容安全日活峰值" },
+  { value: "47 亿/日", label: "内容安全日均调用" },
+  { value: "0", label: "安全事故" },
+];
+
+const advantages = [
+  "平台化与规模化：从 0 到 1 搭建云游戏微端平台与 SDK 体系，一套底座支撑 12 个游戏 / 渠道、4 家厂商、10 亿+ 流水；全权负责构建、Jenkins 打包与发布。",
+  "体系化性能优化：包体（合包治理减少 164MB）/ 渲染 / 启动 / 稳定性四个方向持续治理，用 Perfetto / Profiler / LeakCanary 建立基线并回归。",
+  "AI Agent 工程化（差异化）：围绕 Claude Code 搭建 CLAUDE.md 规范、OpenSpec、技能库与 MCP 工具链，让 Agent 覆盖需求 → 编码 → 测试 → 构建 → 发布 → 文档全流程。",
+  "底层安全与双端能力：内容安全 SDK 全公司接入、零事故；Android / HarmonyOS 双端；精通传统 XML / View 与 Jetpack Compose 双 UI 体系，能混编与渐进迁移。",
+];
+
+const projects = [
   {
-    period: "20XX.XX — 至今",
-    role: "职位名称",
-    company: "公司名称",
-    desc: "负责什么、做出了什么结果。建议用「动作 + 结果」描述，比如「主导 X 系统重构，崩溃率下降 40%」。",
+    period: "2019 — 至今",
+    name: "微端云游戏平台（含云代理 SDK / TapTap SDK）",
+    role: "开创者 / Android主程序",
+    desc: "免下载玩端游：手机远程运行并实时串流，一套底座承载多游戏 / 多厂商 / 多渠道。从 0 到 1 搭建云代理通讯 SDK 与多游戏 flavor 架构，新游戏 / 新厂商接入不改业务层；支撑云游戏流水营收超 10 亿元，4 家厂商 / 12 个渠道包稳定交付。",
   },
   {
-    period: "20XX.XX — 20XX.XX",
-    role: "职位名称",
-    company: "公司名称",
-    desc: "负责什么、做出了什么结果。",
+    period: "2023 — 至今",
+    name: "Splitgame 插件化",
+    role: "核心开发者",
+    desc: "宿主 App 与游戏插件两个独立 APK 合并为一个安装包分发。解决插件 UniSDK 硬编码资源 ID 与宿主冲突、跟进 Android 11–16 资源加载适配，修复合包后支付闪退；Unity il2cpp 资源重定向减少约 164MB 冗余资源；累计提交 114 次。",
+  },
+  {
+    period: "2019 — 至今",
+    name: "安全审核 SDK（内容安全）",
+    role: "Android主程序",
+    desc: "为游戏提供昵称 / 聊天内容的本地实时审核，命中即拦截或替换，不依赖服务端往返。全公司游戏统一接入：单日 Top50 合计 DAU 3,039 万、日均 47 亿次调用、错误率 0.006%、零安全事故；主导 17 个版本迭代，涉及正则编译性能、LZMA 字库、RC4、码点归一化与高并发一致性。",
+  },
+  {
+    period: "2024.08 — 2024.11",
+    name: "微端云游戏 · HarmonyOS NEXT 版",
+    role: "开创者 / 主程序",
+    desc: "把 Android 微端能力移植到纯血鸿蒙（ArkTS / ArkUI / Stage）。团队 68 次提交中占 39 次（首位，约 6,900 行），一套代码产出《逆水寒》《燕云十六声》双包；UniSDK 以 HAR 移植，解决 PC 云游戏触摸穿透与悬浮球。",
+  },
+  {
+    period: "2026",
+    name: "AppShield 壳加固",
+    role: "壳加固负责人",
+    desc: "自研 APK 加固壳：DEX 加密抽取，启动时在内存中解密还原并回填指令。负责 DEX 抽壳与指令回填、Native Hook（execve / mmap / LoadMethod）、ClassLoader 替换与 Android 7–16 版本适配。",
+  },
+  {
+    period: "2026.09 — 2026.10",
+    name: "AI Agent 工程化体系（云游戏插件包自动化生产平台）",
+    role: "创建者 / 主作者",
+    desc: "把「策划提交游戏包 → 转成云游戏版本」的人工流程交给 AI Agent：自动构建、拆包、校验、诊断与修复，产出可发布的插件包。新游戏 / 版本转化从数天缩短到数小时，良品率 ≥ 90%，23 天从 0 到 1。",
+  },
+  {
+    period: "2017 — 2019",
+    name: "社区 App（炉石盒子 / 凯恩之角）",
+    role: "核心开发",
+    desc: "面向《炉石传说》《暗黑破坏神》玩家的工具型社区 App，两款均为提交数 Top 1 贡献者：主界面、卡组 / 聊天、JSBridge、多渠道构建。",
+  },
+];
+
+const experience = [
+  {
+    period: "2017 — 至今",
+    role: "资深移动端开发工程师",
+    company: "网易游戏",
+    desc: "社区 App → 云游戏微端平台 → 安全审核 / 云代理 SDK → AI Agent 工程化，负责多个核心项目的架构与交付。",
+  },
+  {
+    period: "2016 — 2017",
+    role: "Android 开发工程师",
+    company: "广州市久邦数码科技有限公司",
+    desc: "负责 Android 原生小游戏的游戏动效开发：使用原生 Canvas / Paint / Path 与属性动画绘制游戏障碍物与场景，纯原生绘制、不依赖游戏引擎。",
+  },
+  {
+    period: "2015 — 2016.04",
+    role: "Android 开发实习生",
+    company: "猎豹移动",
+    desc: "校招 offer 后进入快图（QuickPic）团队实习，参与 Android 图片浏览器的功能开发与维护。",
+  },
+];
+
+const education = [
+  {
+    period: "2012 — 2016",
+    school: "广东工业大学",
+    major: "软件工程 · 本科",
   },
 ];
 
 const skills = [
-  { group: "语言", items: ["Kotlin", "Java", "Python", "TypeScript"] },
-  { group: "方向", items: ["Android 逆向", "插件化", "性能优化", "AI Agent"] },
-  { group: "工具", items: ["Frida", "JADX", "Ghidra", "Claude Code"] },
+  { group: "语言", items: ["Kotlin", "Java", "Python", "C++", "ArkTS"] },
+  { group: "移动端", items: ["Jetpack Compose", "Coroutines / Flow", "Hilt", "HarmonyOS / ArkUI", "性能优化"] },
+  { group: "架构", items: ["MVVM", "MVI", "组件化", "多厂商适配", "插件化"] },
+  { group: "AI Agent", items: ["Claude Code", "OpenSpec", "MCP", "结构化输出"] },
+  { group: "构建", items: ["APK 签名 / 加固", "Jenkins / CI/CD", "渠道打包"] },
 ];
 ---
 
 <BaseLayout title="简历" sideBarActiveItemID="cv">
   <div class="mt-2 mb-8">
-    <h1 class="text-3xl md:text-4xl font-bold mb-2">简历</h1>
-    <p class="opacity-60 text-sm">目前是占位结构，等你的资料替换。</p>
+    <h1 class="text-3xl md:text-4xl font-bold mb-2">{profile.name}</h1>
+    <p class="font-semibold opacity-90">
+      {profile.title} · {profile.tags.join(" / ")}
+    </p>
+    <p class="opacity-60 text-sm mt-2">{profile.summary}</p>
+    <div class="flex flex-wrap gap-2 mt-4 text-sm">
+      <span class="badge badge-outline">{profile.location}</span>
+      <a class="badge badge-outline" href={`tel:${profile.phone}`}>{profile.phone}</a>
+      <a class="badge badge-outline" href={`mailto:${profile.email}`}>{profile.email}</a>
+      <a class="badge badge-outline" href={profile.blog} target="_blank" rel="noopener">{profile.blog}</a>
+    </div>
   </div>
+
+  <section class="mb-10">
+    <div class="stats stats-vertical sm:stats-horizontal w-full border border-base-300">
+      {stats.map((s) => (
+        <div class="stat">
+          <div class="stat-value text-2xl">{s.value}</div>
+          <div class="stat-desc">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-10">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <span class="w-1.5 h-5 bg-primary rounded-full inline-block"></span>个人优势
+    </h2>
+    <ul class="space-y-2">
+      {advantages.map((a) => (
+        <li class="text-sm opacity-80 leading-relaxed flex gap-2">
+          <span class="text-primary shrink-0">•</span>
+          <span>{a}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="mb-10">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <span class="w-1.5 h-5 bg-primary rounded-full inline-block"></span>项目经历
+    </h2>
+    <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
+      {projects.map((p, i) => (
+        <li>
+          {i > 0 && <hr />}
+          <div class="timeline-middle">
+            <div class="w-3 h-3 rounded-full bg-primary"></div>
+          </div>
+          <div class="timeline-end mb-6 ml-4">
+            <time class="text-xs opacity-50">{p.period}</time>
+            <div class="font-semibold mt-0.5">{p.name} <span class="badge badge-sm badge-primary badge-outline ml-1">{p.role}</span></div>
+            <p class="text-sm opacity-75 mt-1 leading-relaxed">{p.desc}</p>
+          </div>
+          {i < projects.length - 1 && <hr />}
+        </li>
+      ))}
+    </ul>
+  </section>
 
   <section class="mb-10">
     <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
@@ -52,6 +193,25 @@ const skills = [
     </ul>
   </section>
 
+  <section class="mb-10">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <span class="w-1.5 h-5 bg-primary rounded-full inline-block"></span>教育经历
+    </h2>
+    <ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
+      {education.map((ed) => (
+        <li>
+          <div class="timeline-middle">
+            <div class="w-3 h-3 rounded-full bg-primary"></div>
+          </div>
+          <div class="timeline-end mb-6 ml-4">
+            <time class="text-xs opacity-50">{ed.period}</time>
+            <div class="font-semibold mt-0.5">{ed.school} · {ed.major}</div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
   <section>
     <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
       <span class="w-1.5 h-5 bg-primary rounded-full inline-block"></span>技能
@@ -59,7 +219,7 @@ const skills = [
     <div class="space-y-3">
       {skills.map((s) => (
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-sm opacity-60 w-14 shrink-0">{s.group}</span>
+          <span class="text-sm opacity-60 w-16 shrink-0">{s.group}</span>
           {s.items.map((it) => <span class="badge badge-outline">{it}</span>)}
         </div>
       ))}
